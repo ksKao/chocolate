@@ -1,5 +1,6 @@
 #include "error.h"
 #include "fileReader.h"
+#include "lexer.h"
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -9,5 +10,7 @@ int main(int argc, char **argv)
 
     std::string content = readFile(argv[1]);
 
+    Lexer lexer(content);
+    std::vector<Token> token = lexer.tokenize();
     std::cout << content << std::endl;
 }

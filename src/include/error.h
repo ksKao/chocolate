@@ -1,4 +1,4 @@
 #pragma once
 #include <string>
 
-void exitWithError(std::string message);
+void exitWithError(const std::string &message);
