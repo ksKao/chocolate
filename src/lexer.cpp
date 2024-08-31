@@ -1,8 +1,8 @@
 #include "lexer.h"
 #include "token.h"
+#include "error.h"
 #include <vector>
 #include <optional>
-#include "error.h"
 
 const std::vector<Token> Lexer::keywords = {
     {TokenType::LET, "let"},
@@ -51,7 +51,7 @@ Token Lexer::parseWord()
 {
     std::string value = "";
 
-    // only allow alphabets, numbers, and underscroes as word
+    // only allow alphabets, numbers, and underscores as word
     while (getIsValidWordChar(getChar()))
     {
         value.push_back(getChar());
@@ -77,6 +77,7 @@ Token Lexer::parseWord()
             return {TokenType::IDENTIFIER, value};
         }
 
+        // if no words are matched, just continue to the next character
         advance();
     }
 
@@ -93,6 +94,9 @@ Token Lexer::parseSymbol()
     {
     case '=':
         token = {TokenType::EQUALS, "="};
+        break;
+    case ';':
+        token = {TokenType::SEMI_COLON, ";"};
         break;
     default:
         exitWithError("Invalid symbol encountered: " + character);

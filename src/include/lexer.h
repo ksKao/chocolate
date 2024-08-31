@@ -1,3 +1,4 @@
+#pragma once
 #include "token.h"
 #include <string>
 #include <vector>
