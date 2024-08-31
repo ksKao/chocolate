@@ -1,6 +1,6 @@
-#include "lexer.h"
-#include "token.h"
-#include "error.h"
+#include "Lexer.h"
+#include "Token.h"
+#include "Error.h"
 #include <vector>
 #include <optional>
 

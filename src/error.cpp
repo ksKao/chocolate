@@ -1,4 +1,4 @@
-#include "error.h"
+#include "Error.h"
 #include <iostream>
 
 void exitWithError(const std::string &message)

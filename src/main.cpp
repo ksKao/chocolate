@@ -1,6 +1,6 @@
-#include "error.h"
-#include "fileReader.h"
-#include "lexer.h"
+#include "Error.h"
+#include "FileReader.h"
+#include "Lexer.h"
 #include <iostream>
 
 int main(int argc, char **argv)
