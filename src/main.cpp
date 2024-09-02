@@ -1,6 +1,8 @@
 #include "Error.h"
 #include "FileReader.h"
 #include "Lexer.h"
+#include "Parser.h"
+
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -11,6 +13,9 @@ int main(int argc, char **argv)
     std::string content = readFile(argv[1]);
 
     Lexer lexer(content);
-    std::vector<Token> token = lexer.tokenize();
-    std::cout << content << std::endl;
+    std::vector<Token> tokens = lexer.tokenize();
+
+    Parser parser(tokens);
+    Program program = parser.parse();
+    program.print("");
 }
