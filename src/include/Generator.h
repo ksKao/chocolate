@@ -1,9 +1,10 @@
 #pragma once
-#include "Node.h"
+#include "AST/Program.h"
 
 #include <string>
 #include <unordered_map>
 #include <optional>
+#include <memory>
 
 struct OutputLine
 {

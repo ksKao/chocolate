@@ -1,3 +1,5 @@
+#include "AST/NullLiteral.h"
+#include "AST/NumericLiteral.h"
 #include "Error.h"
 #include "Parser.h"
 #include "Token.h"

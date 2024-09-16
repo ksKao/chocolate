@@ -1,8 +1,8 @@
+#include "Error.h"
 #include "Generator.h"
 
 #include <iostream>
 #include <sstream>
-#include "Error.h"
 
 void Generator::appendOutput(const std::string &line, bool indent)
 {

@@ -1,6 +1,7 @@
 #pragma once
+#include "AST/Program.h"
+#include "AST/VariableDeclarationStatement.h"
 #include "Token.h"
-#include "Node.h"
 
 #include <vector>
 #include <memory>
