@@ -9,6 +9,7 @@ struct Node
 {
     virtual std::string getTypeName() const = 0;
     virtual void print(const std::string &indent) const = 0;
+    virtual void generateAssembly() const = 0;
 };
 
 struct Program : public Node
@@ -17,6 +18,7 @@ struct Program : public Node
 
     inline std::string getTypeName() const override { return "Program node"; }
     void print(const std::string &indent) const override;
+    void generateAssembly() const override;
 };
 
 struct VariableDeclarationStatement : public Node
@@ -26,6 +28,7 @@ struct VariableDeclarationStatement : public Node
 
     inline std::string getTypeName() const override { return "Variable declaration statement"; }
     void print(const std::string &indent) const override;
+    void generateAssembly() const override;
 };
 
 struct NumericLiteral : public Node
@@ -34,4 +37,12 @@ struct NumericLiteral : public Node
 
     inline std::string getTypeName() const override { return "Numeric literal"; }
     void print(const std::string &indent) const override;
+    void generateAssembly() const override;
+};
+
+struct NullLiteral : public Node
+{
+    inline std::string getTypeName() const override { return "Null literal"; }
+    void print(const std::string &indent) const override;
+    void generateAssembly() const override;
 };

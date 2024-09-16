@@ -6,7 +6,7 @@
 
 const std::vector<Token> Lexer::keywords = {
     {TokenType::LET, "let"},
-};
+    {TokenType::NULL_, "null"}};
 
 char Lexer::getChar() const
 {

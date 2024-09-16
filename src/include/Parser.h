@@ -18,8 +18,8 @@ private:
 
 private:
     Token eat(std::optional<TokenType> type);
-    Token getToken();
-    bool isEof();
+    Token getToken() const;
+    bool isEof() const;
     std::unique_ptr<Node> parseExpression();
     std::unique_ptr<Node> parseStatement();
     std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();

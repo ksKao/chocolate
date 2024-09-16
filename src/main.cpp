@@ -2,6 +2,7 @@
 #include "FileReader.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "Generator.h"
 
 #include <iostream>
 
@@ -17,5 +18,7 @@ int main(int argc, char **argv)
 
     Parser parser(tokens);
     Program program = parser.parse();
+    std::cout << Generator::getOutput(program) << std::endl;
+
     program.print("");
 }

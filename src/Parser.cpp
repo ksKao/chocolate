@@ -24,12 +24,12 @@ Token Parser::eat(std::optional<TokenType> expectedType = std::nullopt)
     return token;
 }
 
-Token Parser::getToken()
+Token Parser::getToken() const
 {
     return tokens.at(index);
 }
 
-bool Parser::isEof()
+bool Parser::isEof() const
 {
     return getToken().type == TokenType::END_OF_FILE;
 }
@@ -58,18 +58,21 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 
     std::unique_ptr<VariableDeclarationStatement> variableDeclarationStatement = std::make_unique<VariableDeclarationStatement>();
     variableDeclarationStatement->identifier = idenfifier;
-    variableDeclarationStatement->value = nullptr;
 
     Token nextToken = eat();
 
     // something like `let x;`;
+    // in this case, default it to let x = null;
     if (nextToken.type == TokenType::SEMI_COLON)
+    {
+        variableDeclarationStatement->value = std::make_unique<NullLiteral>();
         return variableDeclarationStatement;
+    }
 
     // if did not return, then means it should be something like `let x = 10;`
     if (nextToken.type == TokenType::EQUALS)
     {
-        variableDeclarationStatement->value = parseExpression(); // override the default nullptr assigned initially
+        variableDeclarationStatement->value = parseExpression();
         eat(TokenType::SEMI_COLON);
         return variableDeclarationStatement;
     }

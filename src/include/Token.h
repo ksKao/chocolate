@@ -9,6 +9,7 @@ enum class TokenType
     EQUALS,
     SEMI_COLON,
     NUMBER,
+    NULL_,
     END_OF_FILE,
 };
 
@@ -19,7 +20,7 @@ public:
     std::string value;
 
 public:
-    std::string getName();
+    std::string getName() const;
     static std::string getTokenName(TokenType type);
 
 private:

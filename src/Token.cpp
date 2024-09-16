@@ -1,6 +1,6 @@
 #include "Token.h"
 
-std::string Token::getName()
+std::string Token::getName() const
 {
     return typeToStringMap.at(type);
 }
