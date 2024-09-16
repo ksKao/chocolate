@@ -1,22 +1,22 @@
 #include "fileReader.h"
-#include "error.h"
+
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
-std::string readFile(const std::string &fileName)
-{
-    std::ifstream file(fileName);
+#include "error.h"
 
-    if (!file)
-        exitWithError("Error: Could not open file " + fileName);
+std::string readFile(const std::string &fileName) {
+	std::ifstream file(fileName);
 
-    std::stringstream buffer;
+	if (!file) exitWithError("Error: Could not open file " + fileName);
 
-    buffer << file.rdbuf();
+	std::stringstream buffer;
 
-    file.close();
+	buffer << file.rdbuf();
 
-    return buffer.str();
+	file.close();
+
+	return buffer.str();
 }

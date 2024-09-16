@@ -1,15 +1,14 @@
-#include "Generator.h"
 #include "AST/NumericLiteral.h"
 
 #include <iostream>
 
-void NumericLiteral::print(const std::string &indent) const
-{
-    std::cout << indent << getTypeName() << ": value = " << value << std::endl;
+#include "Generator.h"
+
+void NumericLiteral::print(const std::string &indent) const {
+	std::cout << indent << getTypeName() << ": value = " << value << std::endl;
 }
 
-void NumericLiteral::generateAssembly() const
-{
-    std::string dataName = Generator::getDataName(std::to_string(value));
-    Generator::appendOutput("movss xmm0, DWORD [rel " + dataName + "]");
+void NumericLiteral::generateAssembly() const {
+	std::string dataName = Generator::getDataName(std::to_string(value));
+	Generator::appendOutput("movss xmm0, DWORD [rel " + dataName + "]");
 }

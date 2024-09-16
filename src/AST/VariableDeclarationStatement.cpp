@@ -1,24 +1,24 @@
-#include "Error.h"
-#include "Generator.h"
 #include "AST/VariableDeclarationStatement.h"
 
 #include <iostream>
 
-void VariableDeclarationStatement::print(const std::string &indent) const
-{
-    std::cout << indent << getTypeName() << ": name = " << identifier.value << std::endl;
+#include "Error.h"
+#include "Generator.h"
 
-    value->print(indent + "\t");
+void VariableDeclarationStatement::print(const std::string &indent) const {
+	std::cout << indent << getTypeName() << ": name = " << identifier.value << std::endl;
+
+	value->print(indent + "\t");
 }
 
-void VariableDeclarationStatement::generateAssembly() const
-{
-    // check if variable has already been declared
-    if (Generator::getVariable(identifier.value).has_value())
-        exitWithError("Identifier " + identifier.value + " already exists.");
+void VariableDeclarationStatement::generateAssembly() const {
+	// check if variable has already been declared
+	if (Generator::getVariable(identifier.value).has_value())
+		exitWithError("Identifier " + identifier.value + " already exists.");
 
-    value->generateAssembly();
-    Generator::addVariable(identifier.value);
-    Generator::incrementStack();
-    Generator::appendOutput("movss DWORD [rsp], xmm0"); // move the value stored in xmm into the top stack pointer
+	value->generateAssembly();
+	Generator::addVariable(identifier.value);
+	Generator::incrementStack();
+	// move the value stored in xmm into the top stack pointer
+	Generator::appendOutput("movss DWORD [rsp], xmm0");
 }
