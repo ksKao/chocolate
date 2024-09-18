@@ -12,10 +12,11 @@ void Generator::appendOutput(const std::string &line, bool indent) {
 std::string Generator::getOutput(const Program &program) {
 	// headers
 	Generator::appendOutput("section .text", false);
-	Generator::appendOutput("global _start");
+	Generator::appendOutput("global main");
+	Generator::appendOutput("default rel");
 	Generator::appendOutput("");
 
-	Generator::appendOutput("_start:", false);
+	Generator::appendOutput("main:", false);
 	program.generateAssembly();
 
 	// return 0
