@@ -17,8 +17,8 @@ void VariableDeclarationStatement::generateAssembly() const {
 		exitWithError("Identifier " + identifier.value + " already exists.");
 
 	value->generateAssembly();
-	Generator::addVariable(identifier.value);
 	Generator::incrementStack();
+	Generator::addVariable(identifier.value);
 	// move the value stored in xmm into the top stack pointer
-	Generator::appendOutput("movss DWORD [rsp], xmm0");
+	Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

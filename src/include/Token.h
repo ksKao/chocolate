@@ -9,6 +9,7 @@ enum class TokenType {
 	SEMI_COLON,
 	NUMBER,
 	NULL_,
+	PRINT,
 	END_OF_FILE,
 };
 

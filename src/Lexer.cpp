@@ -6,7 +6,8 @@
 #include "Error.h"
 #include "Token.h"
 
-const std::vector<Token> Lexer::keywords = {{TokenType::LET, "let"}, {TokenType::NULL_, "null"}};
+const std::vector<Token> Lexer::keywords = {
+	{TokenType::LET, "let"}, {TokenType::NULL_, "null"}, {TokenType::PRINT, "print"}};
 
 char Lexer::getChar() const {
 	if (src.length() <= i) return '\0';

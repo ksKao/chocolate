@@ -24,4 +24,5 @@ class Parser {
 	std::unique_ptr<Node> parseStatement();
 	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
 	std::unique_ptr<Node> parsePrimaryExpression();
+	std::unique_ptr<Node> parsePrintStatement();
 };

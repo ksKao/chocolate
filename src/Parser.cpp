@@ -1,7 +1,9 @@
 #include "Parser.h"
 
+#include "AST/Identifier.h"
 #include "AST/NullLiteral.h"
 #include "AST/NumericLiteral.h"
+#include "AST/PrintStatement.h"
 #include "Error.h"
 #include "Token.h"
 
@@ -41,13 +43,15 @@ std::unique_ptr<Node> Parser::parseStatement() {
 	switch (getToken().type) {
 		case TokenType::LET:
 			return parseVariableDeclarationStatement();
+		case TokenType::PRINT:
+			return parsePrintStatement();
 		default:
 			return parseExpression();
 	}
 }
 
 std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationStatement() {
-	eat();	// eat the let keyword
+	eat(TokenType::LET);  // eat the let keyword
 
 	Token idenfifier = eat(TokenType::IDENTIFIER);	// expects idenfifier
 
@@ -78,6 +82,11 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 
 std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 	switch (getToken().type) {
+		case TokenType::IDENTIFIER: {
+			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
+			identifier->name = eat(TokenType::IDENTIFIER).value;
+			return identifier;
+		}
 		case TokenType::NUMBER: {
 			std::unique_ptr<NumericLiteral> numericLiteral = std::make_unique<NumericLiteral>();
 			numericLiteral->value = std::stof(eat(TokenType::NUMBER).value);
@@ -88,6 +97,17 @@ std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 			return nullptr;
 		}
 	}
+}
+
+std::unique_ptr<Node> Parser::parsePrintStatement() {
+	eat(TokenType::PRINT);	// eat the print token
+
+	std::unique_ptr<PrintStatement> printStatement = std::make_unique<PrintStatement>();
+	printStatement->value = parseExpression();
+
+	eat(TokenType::SEMI_COLON);
+
+	return printStatement;
 }
 
 Program Parser::parse() {

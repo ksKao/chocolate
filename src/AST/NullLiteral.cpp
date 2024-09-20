@@ -9,5 +9,5 @@ void NullLiteral::print(const std::string &indent) const {
 }
 
 void NullLiteral::generateAssembly() const {
-	Generator::appendOutput("movss xmm0, DWORD [null]");
+	Generator::appendOutput("movsd xmm0, QWORD [null]");
 }

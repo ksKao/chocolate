@@ -28,7 +28,7 @@ class Generator {
   public:
 	static void appendOutput(const std::string &line, bool indent = true);
 
-	static std::string getDataName(const std::string &value, const std::string &size = "DD");
+	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
 	static std::string getOutput(const Program &program);
 
 	static void addVariable(const std::string &variableName);

@@ -10,5 +10,5 @@ void NumericLiteral::print(const std::string &indent) const {
 
 void NumericLiteral::generateAssembly() const {
 	std::string dataName = Generator::getDataName(std::to_string(value));
-	Generator::appendOutput("movss xmm0, DWORD [" + dataName + "]");
+	Generator::appendOutput("movsd xmm0, QWORD [" + dataName + "]");
 }

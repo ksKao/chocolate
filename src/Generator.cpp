@@ -14,6 +14,7 @@ std::string Generator::getOutput(const Program &program) {
 	Generator::appendOutput("section .text", false);
 	Generator::appendOutput("global main");
 	Generator::appendOutput("default rel");
+	Generator::appendOutput("extern printf");
 	Generator::appendOutput("");
 
 	Generator::appendOutput("main:", false);
@@ -32,7 +33,9 @@ std::string Generator::getOutput(const Program &program) {
 					 << std::endl;
 
 	// add an entry for null
-	outputString << "\tnull DD 0" << std::endl;
+	outputString << "\tnull DQ 0" << std::endl;
+	// add another entry for float printf format
+	outputString << "\tfloat_format db `%f\\n`" << std::endl;
 	outputString << std::endl;
 
 	for (const OutputLine &outputLine : *output)
