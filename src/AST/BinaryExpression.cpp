@@ -26,6 +26,12 @@ void BinaryExpression::generateAssembly() const {
 		case TokenType::PLUS:
 			Generator::appendOutput("addpd xmm0, xmm1");
 			break;
+		case TokenType::MINUS:
+			// xmm1 = xmm1 - xmm0 (xmm1 = left, xmm0 = right)
+			// then move the result into xmm0 for use by other nodes
+			Generator::appendOutput("subpd xmm1, xmm0");
+			Generator::appendOutput("movapd xmm0, xmm1");
+			break;
 		default:
 			exitWithError("Operator " + op.value + " is not a valid binary operator.");
 	}

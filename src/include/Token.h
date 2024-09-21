@@ -7,6 +7,7 @@ enum class TokenType {
 	LET,
 	EQUALS,
 	PLUS,
+	MINUS,
 	SEMI_COLON,
 	NUMBER,
 	NULL_,

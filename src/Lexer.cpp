@@ -87,6 +87,9 @@ Token Lexer::parseSymbol() {
 		case '+':
 			token = {TokenType::PLUS, "+"};
 			break;
+		case '-':
+			token = {TokenType::MINUS, "-"};
+			break;
 		case ';':
 			token = {TokenType::SEMI_COLON, ";"};
 			break;

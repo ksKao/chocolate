@@ -55,8 +55,8 @@ std::unique_ptr<Node> Parser::parseAdditiveExpression() {
 	std::unique_ptr<Node> left = parsePrimaryExpression();
 
 	// use while loop here to handle chaining multiple operators, e.g. 1 + 2 + 3
-	while (getToken().type == TokenType::PLUS) {
-		Token op = eat(TokenType::PLUS);
+	while (getToken().type == TokenType::PLUS || getToken().type == TokenType::MINUS) {
+		Token op = eat();
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
