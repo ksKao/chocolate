@@ -32,6 +32,13 @@ void BinaryExpression::generateAssembly() const {
 			Generator::appendOutput("subpd xmm1, xmm0");
 			Generator::appendOutput("movapd xmm0, xmm1");
 			break;
+		case TokenType::MULTIPLY:
+			Generator::appendOutput("mulpd xmm0, xmm1");
+			break;
+		case TokenType::DIVIDE:
+			Generator::appendOutput("divpd xmm1, xmm0");
+			Generator::appendOutput("movapd xmm0, xmm1");
+			break;
 		default:
 			exitWithError("Operator " + op.value + " is not a valid binary operator.");
 	}

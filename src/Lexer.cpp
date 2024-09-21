@@ -90,6 +90,12 @@ Token Lexer::parseSymbol() {
 		case '-':
 			token = {TokenType::MINUS, "-"};
 			break;
+		case '*':
+			token = {TokenType::MULTIPLY, "*"};
+			break;
+		case '/':
+			token = {TokenType::DIVIDE, "/"};
+			break;
 		case ';':
 			token = {TokenType::SEMI_COLON, ";"};
 			break;

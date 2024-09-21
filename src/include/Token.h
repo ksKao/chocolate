@@ -8,6 +8,8 @@ enum class TokenType {
 	EQUALS,
 	PLUS,
 	MINUS,
+	MULTIPLY,
+	DIVIDE,
 	SEMI_COLON,
 	NUMBER,
 	NULL_,
