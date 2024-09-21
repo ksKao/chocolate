@@ -1,5 +1,6 @@
 #include "Parser.h"
 
+#include "AST/BinaryExpression.h"
 #include "AST/Identifier.h"
 #include "AST/NullLiteral.h"
 #include "AST/NumericLiteral.h"
@@ -36,7 +37,7 @@ bool Parser::isEof() const {
 }
 
 std::unique_ptr<Node> Parser::parseExpression() {
-	return parsePrimaryExpression();
+	return parseAdditiveExpression();
 }
 
 std::unique_ptr<Node> Parser::parseStatement() {
@@ -50,7 +51,44 @@ std::unique_ptr<Node> Parser::parseStatement() {
 	}
 }
 
-std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationStatement() {
+std::unique_ptr<Node> Parser::parseAdditiveExpression() {
+	std::unique_ptr<Node> left = parsePrimaryExpression();
+
+	// use while loop here to handle chaining multiple operators, e.g. 1 + 2 + 3
+	while (getToken().type == TokenType::PLUS) {
+		Token op = eat(TokenType::PLUS);
+
+		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
+		binaryExpression->left = std::move(left);
+		binaryExpression->right = parsePrimaryExpression();
+		binaryExpression->op = op;
+
+		left = std::move(binaryExpression);
+	}
+
+	return left;
+}
+
+std::unique_ptr<Node> Parser::parsePrimaryExpression() {
+	switch (getToken().type) {
+		case TokenType::IDENTIFIER: {
+			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
+			identifier->name = eat(TokenType::IDENTIFIER).value;
+			return identifier;
+		}
+		case TokenType::NUMBER: {
+			std::unique_ptr<NumericLiteral> numericLiteral = std::make_unique<NumericLiteral>();
+			numericLiteral->value = std::stof(eat(TokenType::NUMBER).value);
+			return numericLiteral;
+		}
+		default: {
+			exitWithError("Unexpected token encountered: " + getToken().getName());
+			return nullptr;
+		}
+	}
+}
+
+std::unique_ptr<Node> Parser::parseVariableDeclarationStatement() {
 	eat(TokenType::LET);  // eat the let keyword
 
 	Token idenfifier = eat(TokenType::IDENTIFIER);	// expects idenfifier
@@ -78,25 +116,6 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 	exitWithError("Unexpected token in variable declaration after " + idenfifier.value +
 				  ". Expected ';' or '=', received: " + nextToken.getName());
 	return nullptr;
-}
-
-std::unique_ptr<Node> Parser::parsePrimaryExpression() {
-	switch (getToken().type) {
-		case TokenType::IDENTIFIER: {
-			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
-			identifier->name = eat(TokenType::IDENTIFIER).value;
-			return identifier;
-		}
-		case TokenType::NUMBER: {
-			std::unique_ptr<NumericLiteral> numericLiteral = std::make_unique<NumericLiteral>();
-			numericLiteral->value = std::stof(eat(TokenType::NUMBER).value);
-			return numericLiteral;
-		}
-		default: {
-			exitWithError("Unexpected token encountered: " + getToken().getName());
-			return nullptr;
-		}
-	}
 }
 
 std::unique_ptr<Node> Parser::parsePrintStatement() {

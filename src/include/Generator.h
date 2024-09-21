@@ -23,7 +23,7 @@ struct Data {
 
 class Generator {
   public:
-	static const int stackUnitSize = 8;
+	static const int stackUnitSize = 16;
 
   public:
 	static void appendOutput(const std::string &line, bool indent = true);

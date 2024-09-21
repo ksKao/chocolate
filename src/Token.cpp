@@ -12,6 +12,7 @@ const std::unordered_map<TokenType, std::string> Token::typeToStringMap = {
 	{TokenType::IDENTIFIER, "identifier"},
 	{TokenType::LET, "let"},
 	{TokenType::EQUALS, "="},
+	{TokenType::PLUS, "plus"},
 	{TokenType::SEMI_COLON, ";"},
 	{TokenType::NUMBER, "number"},
 	{TokenType::END_OF_FILE, "eof"},

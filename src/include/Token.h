@@ -6,6 +6,7 @@ enum class TokenType {
 	IDENTIFIER,
 	LET,
 	EQUALS,
+	PLUS,
 	SEMI_COLON,
 	NUMBER,
 	NULL_,

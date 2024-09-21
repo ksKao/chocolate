@@ -6,7 +6,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 	if (argc != 2) exitWithError("Program must have at least 1 argument");
 
 	std::string content = readFile(argv[1]);
