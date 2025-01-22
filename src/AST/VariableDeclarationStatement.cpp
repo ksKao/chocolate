@@ -20,5 +20,6 @@ void VariableDeclarationStatement::generateAssembly() const {
 	Generator::incrementStack();
 	Generator::addVariable(identifier.value);
 	// move the value stored in xmm into the top stack pointer
+	Generator::appendOutput("; Variable Declaration Statement: " + identifier.value);
 	Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

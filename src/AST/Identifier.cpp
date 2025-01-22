@@ -21,5 +21,6 @@ void Identifier::generateAssembly() const {
 	size_t stackOffset =
 		(Generator::getStackSize() - variable.value().stackLocation) * Generator::stackUnitSize;
 
+	Generator::appendOutput("; Identifier: " + name);
 	Generator::appendOutput("movsd xmm0, QWORD [rsp + " + std::to_string(stackOffset) + "]");
 }

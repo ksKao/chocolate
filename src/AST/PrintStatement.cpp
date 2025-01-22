@@ -13,6 +13,7 @@ void PrintStatement::print(const std::string& indent) const {
 void PrintStatement::generateAssembly() const {
 	value->generateAssembly();
 
+	Generator::appendOutput("; Print Statement");
 	Generator::appendOutput("mov rdi, float_format");
 	Generator::appendOutput("mov eax, 1");
 	Generator::appendOutput("call printf");

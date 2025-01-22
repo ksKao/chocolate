@@ -13,29 +13,36 @@ void BinaryExpression::print(const std::string& indent) const {
 }
 
 void BinaryExpression::generateAssembly() const {
+	Generator::appendOutput("; Generating left assembly");
 	left->generateAssembly();
 
 	// move the value stored in xmm0 to xmm1 to make space for value stored in right
+	Generator::appendOutput("; Move value to make space for right value in binary expression");
 	Generator::appendOutput("movapd xmm1, xmm0");
 
+	Generator::appendOutput("; Generating right assembly");
 	right->generateAssembly();
 
 	// now, left's value is stored at xmm1 and right's value is stored at xmm0
 	// so we check what is the operator and generate the corresponding instruction and store in xmm0;
 	switch (op.type) {
 		case TokenType::PLUS:
+			Generator::appendOutput("; Binary Operator: +");
 			Generator::appendOutput("addpd xmm0, xmm1");
 			break;
 		case TokenType::MINUS:
 			// xmm1 = xmm1 - xmm0 (xmm1 = left, xmm0 = right)
 			// then move the result into xmm0 for use by other nodes
+			Generator::appendOutput("; Binary Operator: -");
 			Generator::appendOutput("subpd xmm1, xmm0");
 			Generator::appendOutput("movapd xmm0, xmm1");
 			break;
 		case TokenType::MULTIPLY:
+			Generator::appendOutput("; Binary Operator: *");
 			Generator::appendOutput("mulpd xmm0, xmm1");
 			break;
 		case TokenType::DIVIDE:
+			Generator::appendOutput("; Binary Operator: /");
 			Generator::appendOutput("divpd xmm1, xmm0");
 			Generator::appendOutput("movapd xmm0, xmm1");
 			break;

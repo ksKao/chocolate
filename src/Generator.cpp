@@ -21,6 +21,7 @@ std::string Generator::getOutput(const Program &program) {
 	program.generateAssembly();
 
 	// return 0
+	Generator::appendOutput("; return 0");
 	Generator::appendOutput("mov eax, 60");
 	Generator::appendOutput("xor edi, edi");
 	Generator::appendOutput("syscall");
@@ -75,12 +76,14 @@ std::optional<Variable> Generator::getVariable(const std::string variableName) {
 }
 
 void Generator::incrementStack() {
+	Generator::appendOutput("; Increment stack");
 	Generator::appendOutput("sub rsp, " +
 							std::to_string(Generator::stackUnitSize));	// move top stack pointer up
 	stackSize++;
 }
 
 void Generator::decrementStack() {
+	Generator::appendOutput("; Decrement stack");
 	Generator::appendOutput(
 		"add rsp, " + std::to_string(Generator::stackUnitSize));  // move top stack pointer down
 	stackSize--;
