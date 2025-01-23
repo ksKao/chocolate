@@ -64,7 +64,7 @@ void Generator::addVariable(const std::string &variableName) {
 	if (Generator::getVariable(variableName).has_value())
 		exitWithError("Trying to add a variable (" + variableName + ") when it already exists: ");
 
-	variables.insert({variableName, stackSize});
+	variables.insert({variableName, stackSize - 1});
 }
 
 std::optional<Variable> Generator::getVariable(const std::string variableName) {
