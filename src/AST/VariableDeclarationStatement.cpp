@@ -19,8 +19,8 @@ void VariableDeclarationStatement::generateAssembly() const {
 	value->generateAssembly();
 	// Generator::incrementStack();
 	// move the value stored in the top of the stack
-	Generator::appendOutput(
-		"; Variable Declaration Statement (not doing anything since the right side will already be "
+	Generator::appendComment(
+		"Variable Declaration Statement (not doing anything since the right side will already be "
 		"pushing a value onto the stack): " +
 		identifier.value);
 	Generator::addVariable(identifier.value);

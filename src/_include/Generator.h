@@ -27,6 +27,7 @@ class Generator {
 
   public:
 	static void appendOutput(const std::string &line, bool indent = true);
+	static void appendComment(const std::string &line);
 
 	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
 	static std::string getOutput(const Program &program);

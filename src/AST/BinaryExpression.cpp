@@ -13,37 +13,37 @@ void BinaryExpression::print(const std::string& indent) const {
 }
 
 void BinaryExpression::generateAssembly() const {
-	Generator::appendOutput("; Generating left assembly");
+	Generator::appendComment("Generating left assembly");
 	left->generateAssembly();
 
-	Generator::appendOutput("; Generating right assembly");
+	Generator::appendComment("Generating right assembly");
 	right->generateAssembly();
 
 	// now, stack contains the values of left and right
 	// pop them off and store them in xmm0 and xmm1 respectively
-	Generator::appendOutput("; Getting pushed value from right and store in xmm1");
+	Generator::appendComment("Getting pushed value from right and store in xmm1");
 	Generator::appendOutput("movsd xmm1, QWORD [rsp]");
 	Generator::decrementStack();
-	Generator::appendOutput("; Getting pushed value from left and store in xmm0");
+	Generator::appendComment("Getting pushed value from left and store in xmm0");
 	Generator::appendOutput("movsd xmm0, QWORD [rsp]");
 	Generator::decrementStack();
 
 	// results are always stored in xmm0
 	switch (op.type) {
 		case TokenType::PLUS:
-			Generator::appendOutput("; Binary Operator: +");
+			Generator::appendComment("Binary Operator: +");
 			Generator::appendOutput("addpd xmm0, xmm1");
 			break;
 		case TokenType::MINUS:
-			Generator::appendOutput("; Binary Operator: -");
+			Generator::appendComment("Binary Operator: -");
 			Generator::appendOutput("subpd xmm0, xmm1");
 			break;
 		case TokenType::MULTIPLY:
-			Generator::appendOutput("; Binary Operator: *");
+			Generator::appendComment("Binary Operator: *");
 			Generator::appendOutput("mulpd xmm0, xmm1");
 			break;
 		case TokenType::DIVIDE:
-			Generator::appendOutput("; Binary Operator: /");
+			Generator::appendComment("Binary Operator: /");
 			Generator::appendOutput("divpd xmm0, xmm1");
 			break;
 		default:

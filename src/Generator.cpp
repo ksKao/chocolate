@@ -9,6 +9,10 @@ void Generator::appendOutput(const std::string &line, bool indent) {
 	output->push_back({line, indent});
 }
 
+void Generator::appendComment(const std::string &line) {
+	output->push_back({"; " + line, true});
+}
+
 std::string Generator::getOutput(const Program &program) {
 	// headers
 	Generator::appendOutput("section .text", false);
@@ -21,7 +25,7 @@ std::string Generator::getOutput(const Program &program) {
 	program.generateAssembly();
 
 	// return 0
-	Generator::appendOutput("; return 0");
+	Generator::appendComment("return 0");
 	Generator::appendOutput("mov eax, 60");
 	Generator::appendOutput("xor edi, edi");
 	Generator::appendOutput("syscall");
@@ -76,14 +80,14 @@ std::optional<Variable> Generator::getVariable(const std::string variableName) {
 }
 
 void Generator::incrementStack() {
-	Generator::appendOutput("; Increment stack");
+	Generator::appendComment("Increment stack");
 	Generator::appendOutput("sub rsp, " +
 							std::to_string(Generator::stackUnitSize));	// move top stack pointer up
 	stackSize++;
 }
 
 void Generator::decrementStack() {
-	Generator::appendOutput("; Decrement stack");
+	Generator::appendComment("Decrement stack");
 	Generator::appendOutput(
 		"add rsp, " + std::to_string(Generator::stackUnitSize));  // move top stack pointer down
 	stackSize--;

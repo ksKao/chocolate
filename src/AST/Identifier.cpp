@@ -23,7 +23,7 @@ void Identifier::generateAssembly() const {
 
 	// push value to top of stack
 	Generator::incrementStack();
-	Generator::appendOutput("; Identifier: " + name);
+	Generator::appendComment("Identifier: " + name);
 	Generator::appendOutput("movsd xmm0, QWORD [rsp + " + std::to_string(stackOffset) + "]");
 	Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

@@ -15,7 +15,7 @@ void Program::print(const std::string &indent) const {
 
 void Program::generateAssembly() const {
 	// initialize stack frame
-	Generator::appendOutput("; Initialize stack frame");
+	Generator::appendComment("Initialize stack frame");
 	Generator::appendOutput("push rbp");
 	Generator::appendOutput("mov rbp, rsp");
 
