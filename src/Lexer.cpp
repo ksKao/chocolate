@@ -99,6 +99,12 @@ Token Lexer::parseSymbol() {
 		case ';':
 			token = {TokenType::SEMI_COLON, ";"};
 			break;
+		case '(':
+			token = {TokenType::OPEN_PARENTHESIS, "("};
+			break;
+		case ')':
+			token = {TokenType::CLOSE_PARENTHESIS, ")"};
+			break;
 		default:
 			exitWithError("Invalid symbol encountered: " + character);
 			break;

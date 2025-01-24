@@ -98,6 +98,12 @@ std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 			numericLiteral->value = std::stof(eat(TokenType::NUMBER).value);
 			return numericLiteral;
 		}
+		case TokenType::OPEN_PARENTHESIS: {
+			eat(TokenType::OPEN_PARENTHESIS);
+			std::unique_ptr<Node> result = parseExpression();
+			eat(TokenType::CLOSE_PARENTHESIS);
+			return result;
+		}
 		default: {
 			exitWithError("Unexpected token encountered: " + getToken().getName());
 			return nullptr;
