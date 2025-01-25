@@ -3,20 +3,20 @@
 #include "Error.h"
 
 std::string Token::getName() const {
-	if (typeToStringMap.find(type) == typeToStringMap.end())
+	if (tokenTypeToStringMap.find(type) == tokenTypeToStringMap.end())
 		Error::abort("Unknown token type: " + std::to_string((int)type));
 
-	return typeToStringMap.at(type);
+	return tokenTypeToStringMap.at(type);
 }
 
 std::string Token::getTokenName(TokenType type) {
-	if (typeToStringMap.find(type) == typeToStringMap.end())
+	if (tokenTypeToStringMap.find(type) == tokenTypeToStringMap.end())
 		Error::abort("Unknown token type: " + std::to_string((int)type));
 
-	return typeToStringMap.at(type);
+	return tokenTypeToStringMap.at(type);
 }
 
-const std::unordered_map<TokenType, std::string> Token::typeToStringMap = {
+const std::unordered_map<TokenType, std::string> Token::tokenTypeToStringMap = {
 	{TokenType::IDENTIFIER, "identifier"},
 	{TokenType::LET, "let"},
 	{TokenType::EQUALS, "="},

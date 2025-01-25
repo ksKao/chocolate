@@ -6,21 +6,22 @@
 #include "Generator.h"
 
 void VariableDeclarationStatement::print(const std::string &indent) const {
-	std::cout << indent << getTypeName() << ": name = " << identifier.value << std::endl;
+	std::cout << indent << getName() << ": name = " << identifier->name << std::endl;
 
 	value->print(indent + "\t");
 }
 
-void VariableDeclarationStatement::generateAssembly() const {
+void VariableDeclarationStatement::generateAssembly() {
 	// check if variable has already been declared
-	if (Generator::getVariable(identifier.value).has_value())
-		Error::abort("Identifier " + identifier.value + " already exists.");
+	if (Generator::getVariable(identifier->name) != nullptr)
+		Error::abort("Identifier " + identifier->name + " already exists.");
 
 	value->generateAssembly();
+
 	// move the value stored in the top of the stack
 	Generator::appendComment(
 		"Variable Declaration Statement (not doing anything since the right side will already be "
 		"pushing a value onto the stack): " +
-		identifier.value);
-	Generator::addVariable(identifier.value);
+		identifier->name);
+	Generator::addVariable(identifier->name, value->type);
 }

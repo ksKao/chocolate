@@ -31,5 +31,5 @@ class Token {
 	static std::string getTokenName(TokenType type);
 
   private:
-	static const std::unordered_map<TokenType, std::string> typeToStringMap;
+	static const std::unordered_map<TokenType, std::string> tokenTypeToStringMap;
 };

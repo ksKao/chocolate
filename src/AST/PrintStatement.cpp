@@ -5,12 +5,12 @@
 #include "Generator.h"
 
 void PrintStatement::print(const std::string& indent) const {
-	std::cout << indent << getTypeName() << std::endl;
+	std::cout << indent << getName() << std::endl;
 
 	value->print(indent + "\t");
 }
 
-void PrintStatement::generateAssembly() const {
+void PrintStatement::generateAssembly() {
 	value->generateAssembly();
 
 	Generator::appendComment("Print Statement: print from top of stack");

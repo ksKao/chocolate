@@ -5,10 +5,12 @@
 #include "Generator.h"
 
 void NumericLiteral::print(const std::string &indent) const {
-	std::cout << indent << getTypeName() << ": value = " << value << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): value = " << value
+			  << std::endl;
 }
 
-void NumericLiteral::generateAssembly() const {
+void NumericLiteral::generateAssembly() {
+	type = Type::NUMBER;
 	std::string valueStr = std::to_string(value);
 
 	std::string dataName = Generator::getDataName(valueStr);

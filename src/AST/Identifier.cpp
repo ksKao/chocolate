@@ -6,17 +6,19 @@
 #include "Generator.h"
 
 void Identifier::print(const std::string& indent) const {
-	std::cout << indent << getTypeName() << ": " << name << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): " << name << std::endl;
 }
 
-void Identifier::generateAssembly() const {
+void Identifier::generateAssembly() {
 	// check if identifier has already been declared
-	std::optional<Variable> variable = Generator::getVariable(name);
+	Variable* variable = Generator::getVariable(name);
 
-	if (!variable.has_value()) {
+	if (variable == nullptr) {
 		Error::abort("Variable " + name + " has not been declared.");
 		return;
 	}
+
+	type = variable->type;
 
 	// push value to top of stack
 	Generator::incrementStack();

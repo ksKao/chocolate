@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include <optional>
 #include <string>
 
+#include "AST/Expression.h"
 #include "AST/Scope.h"
 
 struct OutputLine {
@@ -13,6 +13,7 @@ struct OutputLine {
 struct Variable {
 	std::string name;
 	size_t stackLocation;
+	Type type;
 
 	size_t getStackOffset();
 };
@@ -31,10 +32,10 @@ class Generator {
 	static void appendComment(const std::string &line);
 
 	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
-	static std::stringstream getOutput(const Scope &program);
+	static std::stringstream getOutput(Scope &program);
 
-	static void addVariable(const std::string &variableName);
-	static std::optional<Variable> getVariable(const std::string variableName);
+	static void addVariable(const std::string &variableName, Type type);
+	static Variable *getVariable(const std::string variableName);
 
 	static void startScope();
 	static void endScope();

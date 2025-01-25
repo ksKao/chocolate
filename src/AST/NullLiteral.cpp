@@ -5,10 +5,10 @@
 #include "Generator.h"
 
 void NullLiteral::print(const std::string &indent) const {
-	std::cout << indent << getTypeName() << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << ")" << std::endl;
 }
 
-void NullLiteral::generateAssembly() const {
+void NullLiteral::generateAssembly() {
 	Generator::incrementStack();
 	Generator::appendComment("Null literal");
 	Generator::appendOutput("movsd xmm0, QWORD [null]");

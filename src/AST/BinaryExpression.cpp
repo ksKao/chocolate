@@ -6,18 +6,29 @@
 #include "Generator.h"
 
 void BinaryExpression::print(const std::string& indent) const {
-	std::cout << indent << getTypeName() << ": " << op.getName() << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): " << op.getName() << std::endl;
 
 	left->print(indent + "\t");
 	right->print(indent + "\t");
 }
 
-void BinaryExpression::generateAssembly() const {
+void BinaryExpression::generateAssembly() {
 	Generator::appendComment("Generating left assembly");
 	left->generateAssembly();
 
 	Generator::appendComment("Generating right assembly");
 	right->generateAssembly();
+
+	if (left->type != right->type) {
+		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " and " +
+					 right->getTypeName());
+	}
+
+	if (left->type == Type::UNKNOWN) {
+		Error::abort("Could not perform " + op.value + " with unknown type");
+	}
+
+	type = left->type;
 
 	// now, stack contains the values of left and right
 	// pop them off and store them in xmm0 and xmm1 respectively

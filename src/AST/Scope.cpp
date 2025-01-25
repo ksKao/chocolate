@@ -5,16 +5,16 @@
 #include "Generator.h"
 
 void Scope::print(const std::string &indent) const {
-	std::cout << indent << "Begin " << getTypeName() << std::endl;
+	std::cout << indent << "Begin " << getName() << std::endl;
 
 	for (int i = 0; i < statements.size(); i++) {
 		statements.at(i)->print(indent + "\t");
 	}
 
-	std::cout << indent << "End " << getTypeName() << std::endl;
+	std::cout << indent << "End " << getName() << std::endl;
 }
 
-void Scope::generateAssembly() const {
+void Scope::generateAssembly() {
 	if (isRoot) {
 		// initialize stack frame
 		Generator::appendComment("Initialize stack frame");
@@ -24,7 +24,7 @@ void Scope::generateAssembly() const {
 
 	Generator::startScope();
 
-	for (const std::unique_ptr<Node> &statement : statements) {
+	for (std::unique_ptr<Node> &statement : statements) {
 		statement->generateAssembly();
 	}
 

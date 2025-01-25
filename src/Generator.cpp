@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "AST/Expression.h"
 #include "Error.h"
 
 size_t Variable::getStackOffset() {
@@ -17,7 +18,7 @@ void Generator::appendComment(const std::string &line) {
 	output->push_back({"; " + line, true});
 }
 
-std::stringstream Generator::getOutput(const Scope &program) {
+std::stringstream Generator::getOutput(Scope &program) {
 	// headers
 	Generator::appendOutput("section .text", false);
 	Generator::appendOutput("global main");
@@ -68,19 +69,19 @@ size_t Generator::getStackSize() {
 	return stackSize;
 }
 
-void Generator::addVariable(const std::string &variableName) {
-	if (Generator::getVariable(variableName).has_value())
+void Generator::addVariable(const std::string &variableName, Type type) {
+	if (Generator::getVariable(variableName) != nullptr)
 		Error::abort("Trying to add a variable (" + variableName + ") when it already exists: ");
 
-	variables.emplace_back(variableName, stackSize - 1);
+	variables.emplace_back(variableName, stackSize - 1, type);
 }
 
-std::optional<Variable> Generator::getVariable(const std::string variableName) {
-	for (const Variable &variable : variables) {
-		if (variable.name == variableName) return variable;
+Variable *Generator::getVariable(const std::string variableName) {
+	for (Variable &variable : variables) {
+		if (variable.name == variableName) return &variable;
 	}
 
-	return std::nullopt;
+	return nullptr;
 }
 
 void Generator::startScope() {

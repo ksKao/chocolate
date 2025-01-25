@@ -10,9 +10,9 @@ struct Scope : Node {
 		this->isRoot = isRoot;
 	}
 
-	inline std::string getTypeName() const override {
+	inline std::string getName() const override {
 		return "Scope node";
 	}
 	void print(const std::string &indent) const override;
-	void generateAssembly() const override;
+	void generateAssembly() override;
 };

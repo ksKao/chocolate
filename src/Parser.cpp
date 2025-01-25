@@ -120,11 +120,14 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationStatement() {
 	eat(TokenType::LET);  // eat the let keyword
 
-	Token idenfifier = eat(TokenType::IDENTIFIER);	// expects idenfifier
+	Token identifierToken = eat(TokenType::IDENTIFIER);	 // expects idenfifier
+
+	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
+	identifier->name = std::move(identifierToken.value);
 
 	std::unique_ptr<VariableDeclarationStatement> variableDeclarationStatement =
 		std::make_unique<VariableDeclarationStatement>();
-	variableDeclarationStatement->identifier = idenfifier;
+	variableDeclarationStatement->identifier = std::move(identifier);
 
 	Token nextToken = eat();
 
@@ -137,12 +140,14 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 
 	// if did not return, then means it should be something like `let x = 10;`
 	if (nextToken.type == TokenType::EQUALS) {
-		variableDeclarationStatement->value = parseExpression();
+		std::unique_ptr<Expression> rhs = parseExpression();
+		variableDeclarationStatement->value = std::move(rhs);
+
 		eat(TokenType::SEMI_COLON);
 		return variableDeclarationStatement;
 	}
 
-	Error::abort("Unexpected token in variable declaration after " + idenfifier.value +
+	Error::abort("Unexpected token in variable declaration after " + identifier->name +
 				 ". Expected ';' or '=', received: " + nextToken.getName());
 	return nullptr;
 }
@@ -177,8 +182,11 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 
 	std::unique_ptr<AssignmentStatement> assignmentStatement =
 		std::make_unique<AssignmentStatement>();
+	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
 
-	assignmentStatement->identifier = identifierToken;
+	identifier->name = identifierToken.value;
+
+	assignmentStatement->identifier = std::move(identifier);
 
 	eat(TokenType::EQUALS);
 
