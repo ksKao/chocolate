@@ -14,7 +14,7 @@ void Identifier::generateAssembly() const {
 	std::optional<Variable> variable = Generator::getVariable(name);
 
 	if (!variable.has_value()) {
-		exitWithError("Variable " + name + " has not been declared.");
+		Error::abort("Variable " + name + " has not been declared.");
 		return;
 	}
 

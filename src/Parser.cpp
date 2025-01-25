@@ -13,15 +13,15 @@
 /// @return The token consumed
 Token Parser::eat(std::optional<TokenType> expectedType = std::nullopt) {
 	if (tokens.size() == 0) {
-		exitWithError("No tokens found.");
+		Error::abort("No tokens found.");
 		return Token();
 	}
 
 	Token token = tokens.at(index);
 
 	if (expectedType != std::nullopt && token.type != expectedType) {
-		exitWithError("Invalid token type, expected: " + Token::getTokenName(expectedType.value()) +
-					  ", found: " + token.getName());
+		Error::abort("Invalid token type, expected: " + Token::getTokenName(expectedType.value()) +
+					 ", found: " + token.getName());
 		return Token();
 	}
 
@@ -108,7 +108,7 @@ std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 			return result;
 		}
 		default: {
-			exitWithError("Unexpected token encountered: " + getToken().getName());
+			Error::abort("Unexpected token encountered: " + getToken().getName());
 			return nullptr;
 		}
 	}
@@ -139,8 +139,8 @@ std::unique_ptr<Node> Parser::parseVariableDeclarationStatement() {
 		return variableDeclarationStatement;
 	}
 
-	exitWithError("Unexpected token in variable declaration after " + idenfifier.value +
-				  ". Expected ';' or '=', received: " + nextToken.getName());
+	Error::abort("Unexpected token in variable declaration after " + idenfifier.value +
+				 ". Expected ';' or '=', received: " + nextToken.getName());
 	return nullptr;
 }
 

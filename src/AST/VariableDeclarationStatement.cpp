@@ -14,7 +14,7 @@ void VariableDeclarationStatement::print(const std::string &indent) const {
 void VariableDeclarationStatement::generateAssembly() const {
 	// check if variable has already been declared
 	if (Generator::getVariable(identifier.value).has_value())
-		exitWithError("Identifier " + identifier.value + " already exists.");
+		Error::abort("Identifier " + identifier.value + " already exists.");
 
 	value->generateAssembly();
 	// move the value stored in the top of the stack

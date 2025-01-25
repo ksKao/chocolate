@@ -4,14 +4,14 @@
 
 std::string Token::getName() const {
 	if (typeToStringMap.find(type) == typeToStringMap.end())
-		exitWithError("Unknown token type: " + std::to_string((int)type));
+		Error::abort("Unknown token type: " + std::to_string((int)type));
 
 	return typeToStringMap.at(type);
 }
 
 std::string Token::getTokenName(TokenType type) {
 	if (typeToStringMap.find(type) == typeToStringMap.end())
-		exitWithError("Unknown token type: " + std::to_string((int)type));
+		Error::abort("Unknown token type: " + std::to_string((int)type));
 
 	return typeToStringMap.at(type);
 }

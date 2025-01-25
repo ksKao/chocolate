@@ -1,4 +1,6 @@
 #pragma once
 #include <string>
 
-void exitWithError(const std::string &message);
+namespace Error {
+void abort(const std::string &message);
+};	// namespace Error

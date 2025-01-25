@@ -47,7 +47,7 @@ void BinaryExpression::generateAssembly() const {
 			Generator::appendOutput("divpd xmm0, xmm1");
 			break;
 		default:
-			exitWithError("Operator " + op.value + " is not a valid binary operator.");
+			Error::abort("Operator " + op.value + " is not a valid binary operator.");
 	}
 
 	// store the result onto the stack

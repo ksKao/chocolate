@@ -29,7 +29,7 @@ class Generator {
 	static void appendComment(const std::string &line);
 
 	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
-	static std::string getOutput(const Scope &program);
+	static std::stringstream getOutput(const Scope &program);
 
 	static void addVariable(const std::string &variableName);
 	static std::optional<Variable> getVariable(const std::string variableName);

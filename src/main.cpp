@@ -1,22 +1,23 @@
 #include <iostream>
+#include <sstream>
 
 #include "Error.h"
-#include "FileReader.h"
+#include "FileHandler.h"
 #include "Generator.h"
 #include "Lexer.h"
+#include "Options.h"
 #include "Parser.h"
 
 int main(int argc, char** argv) {
-	if (argc != 2) exitWithError("Program must have at least 1 argument");
+	Options::parse(argc, argv);
 
-	std::string content = readFile(argv[1]);
+	std::string content = FileHandler::readFile(Options::inputFilename);
 
 	Lexer lexer(content);
 	std::vector<Token> tokens = lexer.tokenize();
 
 	Parser parser(tokens);
 	Scope program = parser.parse();
-	std::cout << Generator::getOutput(program) << std::endl;
 
-	program.print("");
+	FileHandler::writeFile(Generator::getOutput(program));
 }

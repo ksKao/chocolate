@@ -13,7 +13,7 @@ void Generator::appendComment(const std::string &line) {
 	output->push_back({"; " + line, true});
 }
 
-std::string Generator::getOutput(const Scope &program) {
+std::stringstream Generator::getOutput(const Scope &program) {
 	// headers
 	Generator::appendOutput("section .text", false);
 	Generator::appendOutput("global main");
@@ -46,7 +46,7 @@ std::string Generator::getOutput(const Scope &program) {
 	for (const OutputLine &outputLine : *output)
 		outputString << (outputLine.indent ? "\t" : "") << outputLine.content << std::endl;
 
-	return outputString.str();
+	return outputString;
 }
 
 std::string Generator::getDataName(const std::string &value, const std::string &size) {
@@ -66,7 +66,7 @@ size_t Generator::getStackSize() {
 
 void Generator::addVariable(const std::string &variableName) {
 	if (Generator::getVariable(variableName).has_value())
-		exitWithError("Trying to add a variable (" + variableName + ") when it already exists: ");
+		Error::abort("Trying to add a variable (" + variableName + ") when it already exists: ");
 
 	variables.emplace_back(variableName, stackSize - 1);
 }

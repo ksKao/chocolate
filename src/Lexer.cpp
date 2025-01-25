@@ -72,7 +72,7 @@ Token Lexer::parseWord() {
 		advance();
 	}
 
-	exitWithError("Invalid symbol encountered: " + value);
+	Error::abort("Invalid symbol encountered: " + value);
 	return {};
 }
 
@@ -112,7 +112,7 @@ Token Lexer::parseSymbol() {
 			token = {TokenType::CLOSE_CURLY, "}"};
 			break;
 		default:
-			exitWithError("Invalid symbol encountered: " + character);
+			Error::abort("Invalid symbol encountered: " + character);
 			break;
 	}
 
