@@ -5,6 +5,7 @@
 #include "AST/NullLiteral.h"
 #include "AST/NumericLiteral.h"
 #include "AST/PrintStatement.h"
+#include "AST/Scope.h"
 #include "Error.h"
 #include "Token.h"
 
@@ -46,6 +47,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parseVariableDeclarationStatement();
 		case TokenType::PRINT:
 			return parsePrintStatement();
+		case TokenType::OPEN_CURLY:
+			return parseScope();
 		default:
 			return parseExpression();
 	}
@@ -152,8 +155,22 @@ std::unique_ptr<Node> Parser::parsePrintStatement() {
 	return printStatement;
 }
 
-Program Parser::parse() {
-	Program program;
+std::unique_ptr<Node> Parser::parseScope() {
+	eat(TokenType::OPEN_CURLY);
+
+	std::unique_ptr<Scope> scope = std::make_unique<Scope>();
+
+	while (getToken().type != TokenType::CLOSE_CURLY) {
+		scope->statements.push_back(parseStatement());
+	}
+
+	eat(TokenType::CLOSE_CURLY);
+
+	return scope;
+}
+
+Scope Parser::parse() {
+	Scope program(true);
 
 	while (!isEof()) program.statements.push_back(parseStatement());
 

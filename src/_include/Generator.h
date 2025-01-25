@@ -2,9 +2,8 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <unordered_map>
 
-#include "AST/Program.h"
+#include "AST/Scope.h"
 
 struct OutputLine {
 	std::string content;
@@ -30,10 +29,13 @@ class Generator {
 	static void appendComment(const std::string &line);
 
 	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
-	static std::string getOutput(const Program &program);
+	static std::string getOutput(const Scope &program);
 
 	static void addVariable(const std::string &variableName);
 	static std::optional<Variable> getVariable(const std::string variableName);
+
+	static void startScope();
+	static void endScope();
 
 	static size_t getStackSize();
 	static void incrementStack();
@@ -49,8 +51,11 @@ class Generator {
 	// heap allocate as the output may get very big
 	static std::unique_ptr<std::vector<OutputLine>> output;
 
-	// key is the name of the variable, value is the location of this variable on the stack without counting the actual size in memory
-	static std::unordered_map<std::string, size_t> variables;
+	// stores all the variables in all scopes in the whole program
+	static std::vector<Variable> variables;
+
+	// each element stores the number of variables declared before the scope
+	static std::vector<size_t> numbersOfVariablesDeclaredBeforeScope;
 
 	// all data stored in the .data section
 	static std::vector<Data> data;

@@ -17,12 +17,10 @@ void VariableDeclarationStatement::generateAssembly() const {
 		exitWithError("Identifier " + identifier.value + " already exists.");
 
 	value->generateAssembly();
-	// Generator::incrementStack();
 	// move the value stored in the top of the stack
 	Generator::appendComment(
 		"Variable Declaration Statement (not doing anything since the right side will already be "
 		"pushing a value onto the stack): " +
 		identifier.value);
 	Generator::addVariable(identifier.value);
-	// Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

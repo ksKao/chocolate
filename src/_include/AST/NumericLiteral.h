@@ -2,7 +2,7 @@
 
 #include "Node.h"
 
-struct NumericLiteral : public Node {
+struct NumericLiteral : Node {
 	float value;
 
 	inline std::string getTypeName() const override {

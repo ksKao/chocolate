@@ -13,7 +13,7 @@ void Generator::appendComment(const std::string &line) {
 	output->push_back({"; " + line, true});
 }
 
-std::string Generator::getOutput(const Program &program) {
+std::string Generator::getOutput(const Scope &program) {
 	// headers
 	Generator::appendOutput("section .text", false);
 	Generator::appendOutput("global main");
@@ -68,15 +68,32 @@ void Generator::addVariable(const std::string &variableName) {
 	if (Generator::getVariable(variableName).has_value())
 		exitWithError("Trying to add a variable (" + variableName + ") when it already exists: ");
 
-	variables.insert({variableName, stackSize - 1});
+	variables.emplace_back(variableName, stackSize - 1);
 }
 
 std::optional<Variable> Generator::getVariable(const std::string variableName) {
-	if (variables.find(variableName) == variables.end()) {
-		return std::nullopt;
+	for (const Variable &variable : variables) {
+		if (variable.name == variableName) return variable;
 	}
 
-	return Variable{variableName, variables[variableName]};
+	return std::nullopt;
+}
+
+void Generator::startScope() {
+	numbersOfVariablesDeclaredBeforeScope.push_back(variables.size());
+}
+
+void Generator::endScope() {
+	size_t popCount = variables.size() - numbersOfVariablesDeclaredBeforeScope.back();
+
+	stackSize -= popCount;
+
+	Generator::appendComment("Pop scope");
+	Generator::appendOutput("add rsp, " + std::to_string(popCount * Generator::stackUnitSize));
+
+	variables.resize(variables.size() - popCount);
+
+	numbersOfVariablesDeclaredBeforeScope.pop_back();
 }
 
 void Generator::incrementStack() {
@@ -96,5 +113,8 @@ void Generator::decrementStack() {
 size_t Generator::stackSize = 0;
 std::unique_ptr<std::vector<OutputLine>> Generator::output =
 	std::make_unique<std::vector<OutputLine>>();
-std::unordered_map<std::string, size_t> Generator::variables;
+
+// need these two lines otherwise will have linking error
+std::vector<Variable> Generator::variables;
+std::vector<size_t> Generator::numbersOfVariablesDeclaredBeforeScope;
 std::vector<Data> Generator::data;

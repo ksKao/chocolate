@@ -2,7 +2,7 @@
 
 #include "Node.h"
 
-struct VariableDeclarationStatement : public Node {
+struct VariableDeclarationStatement : Node {
 	Token identifier;
 	std::unique_ptr<Node> value;
 

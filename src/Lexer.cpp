@@ -105,6 +105,12 @@ Token Lexer::parseSymbol() {
 		case ')':
 			token = {TokenType::CLOSE_PARENTHESIS, ")"};
 			break;
+		case '{':
+			token = {TokenType::OPEN_CURLY, "{"};
+			break;
+		case '}':
+			token = {TokenType::CLOSE_CURLY, "}"};
+			break;
 		default:
 			exitWithError("Invalid symbol encountered: " + character);
 			break;

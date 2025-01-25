@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 	std::vector<Token> tokens = lexer.tokenize();
 
 	Parser parser(tokens);
-	Program program = parser.parse();
+	Scope program = parser.parse();
 	std::cout << Generator::getOutput(program) << std::endl;
 
 	program.print("");
