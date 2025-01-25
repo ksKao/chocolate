@@ -84,6 +84,11 @@ Variable *Generator::getVariable(const std::string variableName) {
 	return nullptr;
 }
 
+std::string Generator::createLabel() {
+	labelCounter++;
+	return "label" + std::to_string(labelCounter);
+}
+
 void Generator::startScope() {
 	numbersOfVariablesDeclaredBeforeScope.push_back(variables.size());
 }
@@ -116,10 +121,11 @@ void Generator::decrementStack() {
 }
 
 size_t Generator::stackSize = 0;
+size_t Generator::labelCounter = 0;
 std::unique_ptr<std::vector<OutputLine>> Generator::output =
 	std::make_unique<std::vector<OutputLine>>();
 
-// need these two lines otherwise will have linking error
+// need these lines otherwise will have linking error
 std::vector<Variable> Generator::variables;
 std::vector<size_t> Generator::numbersOfVariablesDeclaredBeforeScope;
 std::vector<Data> Generator::data;

@@ -2,7 +2,7 @@
 
 #include "AST/Node.h"
 
-enum class Type { UNKNOWN, NUMBER };
+enum class Type { UNKNOWN, NUMBER, BOOLEAN };
 
 struct Expression : Node {
   public:

@@ -37,6 +37,8 @@ class Generator {
 	static void addVariable(const std::string &variableName, Type type);
 	static Variable *getVariable(const std::string variableName);
 
+	static std::string createLabel();
+
 	static void startScope();
 	static void endScope();
 
@@ -50,6 +52,9 @@ class Generator {
 
 	// size of the stack without counting the actual size of data in memory
 	static size_t stackSize;
+
+	// counter for labels, will be incremented everytime a label is created to prevent duplicate naming
+	static size_t labelCounter;
 
 	// heap allocate as the output may get very big
 	static std::unique_ptr<std::vector<OutputLine>> output;

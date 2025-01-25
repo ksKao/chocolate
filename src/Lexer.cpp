@@ -7,7 +7,8 @@
 #include "Token.h"
 
 const std::vector<Token> Lexer::keywords = {
-	{TokenType::LET, "let"}, {TokenType::NULL_, "null"}, {TokenType::PRINT, "print"}};
+	{TokenType::LET, "let"}, {TokenType::NULL_, "null"}, {TokenType::PRINT, "print"},
+	{TokenType::IF, "if"},	 {TokenType::TRUE, "true"},	 {TokenType::FALSE, "false"}};
 
 char Lexer::getChar() const {
 	if (src.length() <= i) return '\0';

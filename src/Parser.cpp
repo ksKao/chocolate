@@ -2,6 +2,7 @@
 
 #include "AST/AssignmentStatement.h"
 #include "AST/BinaryExpression.h"
+#include "AST/BooleanLiteral.h"
 #include "AST/Identifier.h"
 #include "AST/NullLiteral.h"
 #include "AST/NumericLiteral.h"
@@ -52,6 +53,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parseScope();
 		case TokenType::IDENTIFIER:
 			return parseAssignmentStatement();
+		case TokenType::IF:
+			return parseIfStatement();
 		default:
 			return parseExpression();
 	}
@@ -109,6 +112,18 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 			std::unique_ptr<Expression> result = parseExpression();
 			eat(TokenType::CLOSE_PARENTHESIS);
 			return result;
+		}
+		case TokenType::TRUE: {
+			eat(TokenType::TRUE);
+			std::unique_ptr<BooleanLiteral> booleanLiteral = std::make_unique<BooleanLiteral>();
+			booleanLiteral->value = true;
+			return booleanLiteral;
+		}
+		case TokenType::FALSE: {
+			eat(TokenType::FALSE);
+			std::unique_ptr<BooleanLiteral> booleanLiteral = std::make_unique<BooleanLiteral>();
+			booleanLiteral->value = false;
+			return booleanLiteral;
 		}
 		default: {
 			Error::abort("Unexpected token encountered: " + getToken().getName());
@@ -195,6 +210,20 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 	eat(TokenType::SEMI_COLON);
 
 	return assignmentStatement;
+}
+
+std::unique_ptr<IfStatement> Parser::parseIfStatement() {
+	eat(TokenType::IF);
+	eat(TokenType::OPEN_PARENTHESIS);
+
+	std::unique_ptr<IfStatement> ifStatement = std::make_unique<IfStatement>();
+	ifStatement->condition = parseExpression();
+
+	eat(TokenType::CLOSE_PARENTHESIS);
+
+	ifStatement->scope = parseScope();
+
+	return ifStatement;
 }
 
 Scope Parser::parse() {

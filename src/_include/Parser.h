@@ -5,6 +5,7 @@
 
 #include "AST/AssignmentStatement.h"
 #include "AST/Expression.h"
+#include "AST/IfStatement.h"
 #include "AST/PrintStatement.h"
 #include "AST/Scope.h"
 #include "AST/VariableDeclarationStatement.h"
@@ -32,4 +33,5 @@ class Parser {
 	std::unique_ptr<PrintStatement> parsePrintStatement();
 	std::unique_ptr<Scope> parseScope();
 	std::unique_ptr<AssignmentStatement> parseAssignmentStatement();
+	std::unique_ptr<IfStatement> parseIfStatement();
 };
