@@ -13,6 +13,8 @@ struct OutputLine {
 struct Variable {
 	std::string name;
 	size_t stackLocation;
+
+	size_t getStackOffset();
 };
 
 struct Data {

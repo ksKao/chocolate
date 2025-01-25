@@ -18,12 +18,10 @@ void Identifier::generateAssembly() const {
 		return;
 	}
 
-	size_t stackOffset =
-		(Generator::getStackSize() - variable.value().stackLocation) * Generator::stackUnitSize;
-
 	// push value to top of stack
 	Generator::incrementStack();
 	Generator::appendComment("Identifier: " + name);
-	Generator::appendOutput("movsd xmm0, QWORD [rsp + " + std::to_string(stackOffset) + "]");
+	Generator::appendOutput("movsd xmm0, QWORD [rsp + " +
+							std::to_string(variable->getStackOffset()) + "]");
 	Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

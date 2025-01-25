@@ -28,4 +28,5 @@ class Parser {
 	std::unique_ptr<Node> parseVariableDeclarationStatement();
 	std::unique_ptr<Node> parsePrintStatement();
 	std::unique_ptr<Node> parseScope();
+	std::unique_ptr<Node> parseAssignmentStatement();
 };

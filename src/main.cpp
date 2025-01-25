@@ -20,4 +20,6 @@ int main(int argc, char** argv) {
 	Scope program = parser.parse();
 
 	FileHandler::writeFile(Generator::getOutput(program));
+
+	program.print("");
 }

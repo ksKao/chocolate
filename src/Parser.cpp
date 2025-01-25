@@ -1,5 +1,6 @@
 #include "Parser.h"
 
+#include "AST/AssignmentStatement.h"
 #include "AST/BinaryExpression.h"
 #include "AST/Identifier.h"
 #include "AST/NullLiteral.h"
@@ -49,6 +50,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parsePrintStatement();
 		case TokenType::OPEN_CURLY:
 			return parseScope();
+		case TokenType::IDENTIFIER:
+			return parseAssignmentStatement();
 		default:
 			return parseExpression();
 	}
@@ -167,6 +170,23 @@ std::unique_ptr<Node> Parser::parseScope() {
 	eat(TokenType::CLOSE_CURLY);
 
 	return scope;
+}
+
+std::unique_ptr<Node> Parser::parseAssignmentStatement() {
+	Token identifierToken = eat(TokenType::IDENTIFIER);
+
+	std::unique_ptr<AssignmentStatement> assignmentStatement =
+		std::make_unique<AssignmentStatement>();
+
+	assignmentStatement->identifier = identifierToken;
+
+	eat(TokenType::EQUALS);
+
+	assignmentStatement->rhs = parseExpression();
+
+	eat(TokenType::SEMI_COLON);
+
+	return assignmentStatement;
 }
 
 Scope Parser::parse() {

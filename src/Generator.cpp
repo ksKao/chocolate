@@ -5,6 +5,10 @@
 
 #include "Error.h"
 
+size_t Variable::getStackOffset() {
+	return (Generator::getStackSize() - stackLocation - 1) * Generator::stackUnitSize;
+}
+
 void Generator::appendOutput(const std::string &line, bool indent) {
 	output->push_back({line, indent});
 }
