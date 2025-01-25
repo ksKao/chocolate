@@ -1,7 +1,7 @@
 #pragma once
-#include "Node.h"
+#include "AST/Expression.h"
 
-struct NullLiteral : public Node {
+struct NullLiteral : Expression {
 	inline std::string getTypeName() const override {
 		return "Null literal";
 	}

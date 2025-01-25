@@ -1,10 +1,10 @@
 #pragma once
 
-#include "AST/Node.h"
+#include "AST/Expression.h"
 
-struct BinaryExpression : Node {
-	std::unique_ptr<Node> left;
-	std::unique_ptr<Node> right;
+struct BinaryExpression : Expression {
+	std::unique_ptr<Expression> left;
+	std::unique_ptr<Expression> right;
 	Token op;
 
 	inline std::string getTypeName() const override {

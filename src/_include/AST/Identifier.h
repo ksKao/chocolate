@@ -1,7 +1,7 @@
 #pragma once
-#include "AST/Node.h"
+#include "AST/Expression.h"
 
-struct Identifier : Node {
+struct Identifier : Expression {
 	std::string name;
 
 	inline std::string getTypeName() const override {

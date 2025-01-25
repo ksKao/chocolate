@@ -3,6 +3,9 @@
 #include <optional>
 #include <vector>
 
+#include "AST/AssignmentStatement.h"
+#include "AST/Expression.h"
+#include "AST/PrintStatement.h"
 #include "AST/Scope.h"
 #include "AST/VariableDeclarationStatement.h"
 #include "Token.h"
@@ -20,13 +23,13 @@ class Parser {
 	Token eat(std::optional<TokenType> type);
 	Token getToken() const;
 	bool isEof() const;
-	std::unique_ptr<Node> parseExpression();
+	std::unique_ptr<Expression> parseExpression();
 	std::unique_ptr<Node> parseStatement();
-	std::unique_ptr<Node> parseAdditiveExpression();
-	std::unique_ptr<Node> parseMultiplicativeExpression();
-	std::unique_ptr<Node> parsePrimaryExpression();
-	std::unique_ptr<Node> parseVariableDeclarationStatement();
-	std::unique_ptr<Node> parsePrintStatement();
-	std::unique_ptr<Node> parseScope();
-	std::unique_ptr<Node> parseAssignmentStatement();
+	std::unique_ptr<Expression> parseAdditiveExpression();
+	std::unique_ptr<Expression> parseMultiplicativeExpression();
+	std::unique_ptr<Expression> parsePrimaryExpression();
+	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
+	std::unique_ptr<PrintStatement> parsePrintStatement();
+	std::unique_ptr<Scope> parseScope();
+	std::unique_ptr<AssignmentStatement> parseAssignmentStatement();
 };

@@ -38,7 +38,7 @@ bool Parser::isEof() const {
 	return getToken().type == TokenType::END_OF_FILE;
 }
 
-std::unique_ptr<Node> Parser::parseExpression() {
+std::unique_ptr<Expression> Parser::parseExpression() {
 	return parseAdditiveExpression();
 }
 
@@ -57,8 +57,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 	}
 }
 
-std::unique_ptr<Node> Parser::parseAdditiveExpression() {
-	std::unique_ptr<Node> left = parseMultiplicativeExpression();
+std::unique_ptr<Expression> Parser::parseAdditiveExpression() {
+	std::unique_ptr<Expression> left = parseMultiplicativeExpression();
 
 	// use while loop here to handle chaining multiple operators, e.g. 1 + 2 + 3
 	while (getToken().type == TokenType::PLUS || getToken().type == TokenType::MINUS) {
@@ -75,8 +75,8 @@ std::unique_ptr<Node> Parser::parseAdditiveExpression() {
 	return left;
 }
 
-std::unique_ptr<Node> Parser::parseMultiplicativeExpression() {
-	std::unique_ptr<Node> left = parsePrimaryExpression();
+std::unique_ptr<Expression> Parser::parseMultiplicativeExpression() {
+	std::unique_ptr<Expression> left = parsePrimaryExpression();
 
 	while (getToken().type == TokenType::MULTIPLY || getToken().type == TokenType::DIVIDE) {
 		Token op = eat();
@@ -92,7 +92,7 @@ std::unique_ptr<Node> Parser::parseMultiplicativeExpression() {
 	return left;
 }
 
-std::unique_ptr<Node> Parser::parsePrimaryExpression() {
+std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 	switch (getToken().type) {
 		case TokenType::IDENTIFIER: {
 			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
@@ -106,7 +106,7 @@ std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 		}
 		case TokenType::OPEN_PARENTHESIS: {
 			eat(TokenType::OPEN_PARENTHESIS);
-			std::unique_ptr<Node> result = parseExpression();
+			std::unique_ptr<Expression> result = parseExpression();
 			eat(TokenType::CLOSE_PARENTHESIS);
 			return result;
 		}
@@ -117,7 +117,7 @@ std::unique_ptr<Node> Parser::parsePrimaryExpression() {
 	}
 }
 
-std::unique_ptr<Node> Parser::parseVariableDeclarationStatement() {
+std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationStatement() {
 	eat(TokenType::LET);  // eat the let keyword
 
 	Token idenfifier = eat(TokenType::IDENTIFIER);	// expects idenfifier
@@ -147,7 +147,7 @@ std::unique_ptr<Node> Parser::parseVariableDeclarationStatement() {
 	return nullptr;
 }
 
-std::unique_ptr<Node> Parser::parsePrintStatement() {
+std::unique_ptr<PrintStatement> Parser::parsePrintStatement() {
 	eat(TokenType::PRINT);	// eat the print token
 
 	std::unique_ptr<PrintStatement> printStatement = std::make_unique<PrintStatement>();
@@ -158,7 +158,7 @@ std::unique_ptr<Node> Parser::parsePrintStatement() {
 	return printStatement;
 }
 
-std::unique_ptr<Node> Parser::parseScope() {
+std::unique_ptr<Scope> Parser::parseScope() {
 	eat(TokenType::OPEN_CURLY);
 
 	std::unique_ptr<Scope> scope = std::make_unique<Scope>();
@@ -172,7 +172,7 @@ std::unique_ptr<Node> Parser::parseScope() {
 	return scope;
 }
 
-std::unique_ptr<Node> Parser::parseAssignmentStatement() {
+std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 	Token identifierToken = eat(TokenType::IDENTIFIER);
 
 	std::unique_ptr<AssignmentStatement> assignmentStatement =

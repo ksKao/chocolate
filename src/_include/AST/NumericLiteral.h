@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Node.h"
+#include "AST/Expression.h"
 
-struct NumericLiteral : Node {
+struct NumericLiteral : Expression {
 	float value;
 
 	inline std::string getTypeName() const override {
