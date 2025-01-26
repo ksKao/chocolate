@@ -31,37 +31,92 @@ void BinaryExpression::generateAssembly() {
 	type = left->type;
 
 	// now, stack contains the values of left and right
-	// pop them off and store them in xmm0 and xmm1 respectively
-	Generator::appendComment("Getting pushed value from right and store in xmm1");
-	Generator::appendOutput("movsd xmm1, QWORD [rsp]");
-	Generator::decrementStack();
-	Generator::appendComment("Getting pushed value from left and store in xmm0");
-	Generator::appendOutput("movsd xmm0, QWORD [rsp]");
-	Generator::decrementStack();
+	// pop them off and store them in different registers depending on their data types
+	if (type == Type::NUMBER) {
+		Generator::appendComment("Getting pushed value from right and store in xmm1");
+		Generator::appendOutput("movsd xmm1, QWORD [rsp]");
+		Generator::decrementStack();
+		Generator::appendComment("Getting pushed value from left and store in xmm0");
+		Generator::appendOutput("movsd xmm0, QWORD [rsp]");
+		Generator::decrementStack();
+	} else if (type == Type::BOOLEAN) {
+		Generator::appendComment("Getting pushed value from right and store in rbx");
+		Generator::appendOutput("mov rbx, [rsp]");
+		Generator::decrementStack();
+		Generator::appendComment("Getting pushed value from left and store in rax");
+		Generator::appendOutput("mov rax, [rsp]");
+		Generator::decrementStack();
+	} else {
+		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " type");
+	}
 
 	// results are always stored in xmm0
 	switch (op.type) {
 		case TokenType::PLUS:
 			Generator::appendComment("Binary Operator: +");
 			Generator::appendOutput("addpd xmm0, xmm1");
+			Generator::incrementStack();
+			Generator::appendOutput("movsd QWORD [rsp], xmm0");
 			break;
 		case TokenType::MINUS:
 			Generator::appendComment("Binary Operator: -");
 			Generator::appendOutput("subpd xmm0, xmm1");
+			Generator::incrementStack();
+			Generator::appendOutput("movsd QWORD [rsp], xmm0");
 			break;
 		case TokenType::MULTIPLY:
 			Generator::appendComment("Binary Operator: *");
 			Generator::appendOutput("mulpd xmm0, xmm1");
+			Generator::incrementStack();
+			Generator::appendOutput("movsd QWORD [rsp], xmm0");
 			break;
 		case TokenType::DIVIDE:
 			Generator::appendComment("Binary Operator: /");
 			Generator::appendOutput("divpd xmm0, xmm1");
+			Generator::incrementStack();
+			Generator::appendOutput("movsd QWORD [rsp], xmm0");
+			break;
+		case TokenType::DOUBLE_EQUALS:
+			type = Type::BOOLEAN;
+			Generator::appendComment("Binary Operator: ==");
+			if (type == Type::NUMBER || type == Type::BOOLEAN) {
+				/*
+				_start:
+					; Compare rax and rbx
+					cmp rax, rbx       ; Compare the values in rax and rbx
+					je  .equal          ; Jump to .equal if rax == rbx (JE stands for "jump if equal")
+					
+					; If not equal, push 0
+					push 0
+					jmp .done           ; Skip the next part if not equal
+					
+				.equal:
+					; If equal, push 1
+					push 1
+					
+				.done:
+					; You can continue here with other code
+					; For example, exit or other operations
+				*/
+				if (left->type == Type::BOOLEAN) Generator::appendOutput("cmp rax, rbx");
+				else Generator::appendOutput("comisd xmm0, xmm1");
+
+				std::string equalLabel = Generator::createLabel();
+				std::string doneLabel = Generator::createLabel();
+				Generator::appendOutput("je " + equalLabel);
+				Generator::incrementStack();
+				Generator::appendOutput("mov QWORD [rsp], 0");
+				Generator::appendOutput("jmp " + doneLabel);
+				Generator::appendOutput(equalLabel + ":", false);
+				Generator::incrementStack();
+				Generator::appendOutput("mov QWORD [rsp], 1");
+				Generator::appendOutput(doneLabel + ":", false);
+			} else {
+				Error::abort("Could not perform " + op.value + " with " + left->getTypeName() +
+							 " type");
+			}
 			break;
 		default:
 			Error::abort("Operator " + op.value + " is not a valid binary operator.");
 	}
-
-	// store the result onto the stack
-	Generator::incrementStack();
-	Generator::appendOutput("movsd QWORD [rsp], xmm0");
 }

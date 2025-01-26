@@ -23,7 +23,14 @@ void Identifier::generateAssembly() {
 	// push value to top of stack
 	Generator::incrementStack();
 	Generator::appendComment("Identifier: " + name);
-	Generator::appendOutput("movsd xmm0, QWORD [rsp + " +
-							std::to_string(variable->getStackOffset()) + "]");
-	Generator::appendOutput("movsd QWORD [rsp], xmm0");
+	if (type == Type::NUMBER) {
+		Generator::appendOutput("movsd xmm0, QWORD [rsp + " +
+								std::to_string(variable->getStackOffset()) + "]");
+		Generator::appendOutput("movsd QWORD [rsp], xmm0");
+	} else if (type == Type::BOOLEAN) {
+		Generator::appendOutput("mov rax, QWORD [rsp + " +
+								std::to_string(variable->getStackOffset()) + "]");
+		Generator::appendOutput("mov QWORD [rsp], rax");
+	} else {
+	}
 }

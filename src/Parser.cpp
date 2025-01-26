@@ -40,7 +40,7 @@ bool Parser::isEof() const {
 }
 
 std::unique_ptr<Expression> Parser::parseExpression() {
-	return parseAdditiveExpression();
+	return parseComparisonExpression();
 }
 
 std::unique_ptr<Node> Parser::parseStatement() {
@@ -58,6 +58,23 @@ std::unique_ptr<Node> Parser::parseStatement() {
 		default:
 			return parseExpression();
 	}
+}
+
+std::unique_ptr<Expression> Parser::parseComparisonExpression() {
+	std::unique_ptr<Expression> left = parseAdditiveExpression();
+
+	while (getToken().type == TokenType::DOUBLE_EQUALS) {
+		Token op = eat();
+
+		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
+		binaryExpression->left = std::move(left);
+		binaryExpression->right = parseAdditiveExpression();
+		binaryExpression->op = op;
+
+		left = std::move(binaryExpression);
+	}
+
+	return left;
 }
 
 std::unique_ptr<Expression> Parser::parseAdditiveExpression() {

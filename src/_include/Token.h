@@ -19,6 +19,7 @@ enum class TokenType {
 	IF,
 	TRUE,
 	FALSE,
+	DOUBLE_EQUALS,
 	NULL_,
 	PRINT,
 	END_OF_FILE,

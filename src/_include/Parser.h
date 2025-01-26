@@ -26,6 +26,7 @@ class Parser {
 	bool isEof() const;
 	std::unique_ptr<Expression> parseExpression();
 	std::unique_ptr<Node> parseStatement();
+	std::unique_ptr<Expression> parseComparisonExpression();
 	std::unique_ptr<Expression> parseAdditiveExpression();
 	std::unique_ptr<Expression> parseMultiplicativeExpression();
 	std::unique_ptr<Expression> parsePrimaryExpression();

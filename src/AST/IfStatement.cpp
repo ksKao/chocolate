@@ -25,12 +25,12 @@ void IfStatement::generateAssembly() {
 	std::string label = Generator::createLabel();
 
 	Generator::appendComment("If statement");
-	Generator::appendOutput("mov rax, [rsp]");
+	Generator::appendOutput("mov rax, QWORD [rsp]");
 
 	Generator::decrementStack();
 
-	Generator::appendOutput("test rax, rax");
-	Generator::appendOutput("jz " + label);
+	Generator::appendOutput("cmp rax, 0");
+	Generator::appendOutput("je " + label);
 
 	scope->generateAssembly();
 	Generator::appendOutput(label + ":", false);

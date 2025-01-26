@@ -83,7 +83,12 @@ Token Lexer::parseSymbol() {
 
 	switch (character) {
 		case '=':
-			token = {TokenType::EQUALS, "="};
+			if (peek() == '=') {
+				token = {TokenType::DOUBLE_EQUALS, "=="};
+				advance();
+			} else {
+				token = {TokenType::EQUALS, "="};
+			}
 			break;
 		case '+':
 			token = {TokenType::PLUS, "+"};
