@@ -118,7 +118,9 @@ Token Lexer::parseSymbol() {
 			token = {TokenType::CLOSE_CURLY, "}"};
 			break;
 		default:
-			Error::abort("Invalid symbol encountered: " + character);
+			std::string errorMsg("Invalid symbol encountered: ");
+			errorMsg.push_back(character);
+			Error::abort(errorMsg);
 			break;
 	}
 
