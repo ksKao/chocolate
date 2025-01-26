@@ -44,8 +44,13 @@ std::stringstream Generator::getOutput(Scope &program) {
 
 	// add an entry for null
 	outputString << "\tnull DQ 0" << std::endl;
-	// add another entry for float printf format
-	outputString << "\tfloat_format db `%f\\n`" << std::endl;
+
+	// setup for printf
+	outputString << "\tfloat_format db `%f\\n`, 0" << std::endl;
+	outputString << "\tstring_format db `%s\\n`, 0" << std::endl;
+	outputString << "\ttrue db 'true', 0" << std::endl;
+	outputString << "\tfalse db 'false', 0" << std::endl;
+
 	outputString << std::endl;
 
 	for (const OutputLine &outputLine : *output)
