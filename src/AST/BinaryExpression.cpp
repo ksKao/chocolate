@@ -98,17 +98,16 @@ void BinaryExpression::generateAssembly() {
 					; You can continue here with other code
 					; For example, exit or other operations
 				*/
+				Generator::incrementStack();
 				if (left->type == Type::BOOLEAN) Generator::appendOutput("cmp rax, rbx");
 				else Generator::appendOutput("comisd xmm0, xmm1");
 
 				std::string equalLabel = Generator::createLabel();
 				std::string doneLabel = Generator::createLabel();
 				Generator::appendOutput("je " + equalLabel);
-				Generator::incrementStack();
 				Generator::appendOutput("mov QWORD [rsp], 0");
 				Generator::appendOutput("jmp " + doneLabel);
 				Generator::appendOutput(equalLabel + ":", false);
-				Generator::incrementStack();
 				Generator::appendOutput("mov QWORD [rsp], 1");
 				Generator::appendOutput(doneLabel + ":", false);
 			} else {
