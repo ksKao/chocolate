@@ -10,6 +10,7 @@
 #include "AST/Scope.h"
 #include "AST/VariableDeclarationStatement.h"
 #include "Token.h"
+#include "ast/UnaryExpression.h"
 
 class Parser {
   public:
@@ -29,6 +30,7 @@ class Parser {
 	std::unique_ptr<Expression> parseComparisonExpression();
 	std::unique_ptr<Expression> parseAdditiveExpression();
 	std::unique_ptr<Expression> parseMultiplicativeExpression();
+	std::unique_ptr<Expression> parseUnaryExpression();
 	std::unique_ptr<Expression> parsePrimaryExpression();
 	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
 	std::unique_ptr<PrintStatement> parsePrintStatement();

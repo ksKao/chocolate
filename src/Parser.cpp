@@ -96,20 +96,37 @@ std::unique_ptr<Expression> Parser::parseAdditiveExpression() {
 }
 
 std::unique_ptr<Expression> Parser::parseMultiplicativeExpression() {
-	std::unique_ptr<Expression> left = parsePrimaryExpression();
+	std::unique_ptr<Expression> left = parseUnaryExpression();
 
 	while (getToken().type == TokenType::MULTIPLY || getToken().type == TokenType::DIVIDE) {
 		Token op = eat();
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parsePrimaryExpression();
+		binaryExpression->right = parseUnaryExpression();
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
 	}
 
 	return left;
+}
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+	Token token = getToken();
+
+	switch (token.type) {
+		case TokenType::MINUS: {
+			Token op = eat();
+			std::unique_ptr<UnaryExpression> unaryExpression = std::make_unique<UnaryExpression>();
+			unaryExpression->operand = parsePrimaryExpression();
+			unaryExpression->op = op;
+			return unaryExpression;
+		}
+		default: {
+			return parsePrimaryExpression();
+		}
+	}
 }
 
 std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
