@@ -146,6 +146,9 @@ std::vector<Token> Lexer::tokenize() {
 		} else if (iswspace(character)) {  // ignore white space
 			advance();
 			continue;
+		} else if (character == '/' && peek() == '/') {
+			advance();
+			while (getChar() != '\n' && getChar() != '\0') advance();
 		} else {
 			tokens.push_back(parseSymbol());
 		}
