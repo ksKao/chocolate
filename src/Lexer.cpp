@@ -117,6 +117,9 @@ Token Lexer::parseSymbol() {
 		case '}':
 			token = {TokenType::CLOSE_CURLY, "}"};
 			break;
+		case '!':
+			token = {TokenType::NOT, "!"};
+			break;
 		default:
 			std::string errorMsg("Invalid symbol encountered: ");
 			errorMsg.push_back(character);

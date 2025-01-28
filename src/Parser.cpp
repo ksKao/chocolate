@@ -116,7 +116,8 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression() {
 	Token token = getToken();
 
 	switch (token.type) {
-		case TokenType::MINUS: {
+		case TokenType::MINUS:
+		case TokenType::NOT: {
 			Token op = eat();
 			std::unique_ptr<UnaryExpression> unaryExpression = std::make_unique<UnaryExpression>();
 			unaryExpression->operand = parsePrimaryExpression();

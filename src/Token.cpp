@@ -34,6 +34,7 @@ const std::unordered_map<TokenType, std::string> Token::tokenTypeToStringMap = {
 	{TokenType::TRUE, "true"},
 	{TokenType::FALSE, "false"},
 	{TokenType::DOUBLE_EQUALS, "=="},
+	{TokenType::NOT, "!"},
 	{TokenType::NULL_, "null"},
 	{TokenType::PRINT, "print"},
 	{TokenType::END_OF_FILE, "eof"},
