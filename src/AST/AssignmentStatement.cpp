@@ -29,9 +29,6 @@ void AssignmentStatement::generateAssembly() {
 
 	Generator::appendComment("Assigning " + variable->name + " at stack position " +
 							 std::to_string(variable->stackLocation));
-	Generator::appendOutput("movsd xmm0, QWORD [rsp]");
-	Generator::appendOutput("movsd QWORD [rsp + " + std::to_string(variable->getStackOffset()) +
-							"], xmm0");
-
-	Generator::decrementStack();
+	Generator::pop("xmm0");
+	Generator::copyValueToStackFrom("xmm0", variable->getStackOffset());
 }

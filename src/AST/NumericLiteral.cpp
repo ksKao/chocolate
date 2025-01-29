@@ -15,8 +15,7 @@ void NumericLiteral::generateAssembly() {
 
 	std::string dataName = Generator::getDataName(valueStr);
 
-	Generator::incrementStack();
 	Generator::appendComment("Numeric Literal: " + valueStr);
-	Generator::appendOutput("movsd xmm0, QWORD [" + dataName + "]");
-	Generator::appendOutput("movsd QWORD [rsp], xmm0");
+	Generator::appendOutput("movq xmm0, QWORD [" + dataName + "]");
+	Generator::push("xmm0");
 }

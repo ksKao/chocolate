@@ -34,18 +34,14 @@ void BinaryExpression::generateAssembly() {
 	// pop them off and store them in different registers depending on their data types
 	if (type == Type::NUMBER) {
 		Generator::appendComment("Getting pushed value from right and store in xmm1");
-		Generator::appendOutput("movsd xmm1, QWORD [rsp]");
-		Generator::decrementStack();
+		Generator::pop("xmm1");
 		Generator::appendComment("Getting pushed value from left and store in xmm0");
-		Generator::appendOutput("movsd xmm0, QWORD [rsp]");
-		Generator::decrementStack();
+		Generator::pop("xmm0");
 	} else if (type == Type::BOOLEAN) {
 		Generator::appendComment("Getting pushed value from right and store in rbx");
-		Generator::appendOutput("mov rbx, [rsp]");
-		Generator::decrementStack();
+		Generator::pop("rbx");
 		Generator::appendComment("Getting pushed value from left and store in rax");
-		Generator::appendOutput("mov rax, [rsp]");
-		Generator::decrementStack();
+		Generator::pop("rax");
 	} else {
 		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " type");
 	}
@@ -55,26 +51,22 @@ void BinaryExpression::generateAssembly() {
 		case TokenType::PLUS:
 			Generator::appendComment("Binary Operator: +");
 			Generator::appendOutput("addpd xmm0, xmm1");
-			Generator::incrementStack();
-			Generator::appendOutput("movsd QWORD [rsp], xmm0");
+			Generator::push("xmm0");
 			break;
 		case TokenType::MINUS:
 			Generator::appendComment("Binary Operator: -");
 			Generator::appendOutput("subpd xmm0, xmm1");
-			Generator::incrementStack();
-			Generator::appendOutput("movsd QWORD [rsp], xmm0");
+			Generator::push("xmm0");
 			break;
 		case TokenType::MULTIPLY:
 			Generator::appendComment("Binary Operator: *");
 			Generator::appendOutput("mulpd xmm0, xmm1");
-			Generator::incrementStack();
-			Generator::appendOutput("movsd QWORD [rsp], xmm0");
+			Generator::push("xmm0");
 			break;
 		case TokenType::DIVIDE:
 			Generator::appendComment("Binary Operator: /");
 			Generator::appendOutput("divpd xmm0, xmm1");
-			Generator::incrementStack();
-			Generator::appendOutput("movsd QWORD [rsp], xmm0");
+			Generator::push("xmm0");
 			break;
 		case TokenType::DOUBLE_EQUALS:
 			type = Type::BOOLEAN;

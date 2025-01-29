@@ -20,25 +20,25 @@ void Generator::appendComment(const std::string &line) {
 
 std::stringstream Generator::getOutput(Scope &program) {
 	// headers
-	Generator::appendOutput("section .text", false);
-	Generator::appendOutput("global main");
-	Generator::appendOutput("default rel");
-	Generator::appendOutput("extern printf");
-	Generator::appendOutput("");
+	appendOutput("section .text", false);
+	appendOutput("global main");
+	appendOutput("default rel");
+	appendOutput("extern printf");
+	appendOutput("");
 
-	Generator::appendOutput("main:", false);
+	appendOutput("main:", false);
 	program.generateAssembly();
 
 	// return 0
-	Generator::appendComment("return 0");
-	Generator::appendOutput("mov eax, 60");
-	Generator::appendOutput("xor edi, edi");
-	Generator::appendOutput("syscall");
+	appendComment("return 0");
+	appendOutput("mov eax, 60");
+	appendOutput("xor edi, edi");
+	appendOutput("syscall");
 
 	std::stringstream outputString;
 
 	outputString << "section .data" << std::endl;
-	for (size_t i = 0; i < Generator::data.size(); i++)
+	for (size_t i = 0; i < data.size(); i++)
 		outputString << "\td" << i << ' ' << data.at(i).size << ' ' << data.at(i).value
 					 << std::endl;
 
@@ -75,7 +75,7 @@ size_t Generator::getStackSize() {
 }
 
 void Generator::addVariable(const std::string &variableName, Type type) {
-	if (Generator::getVariable(variableName) != nullptr)
+	if (getVariable(variableName) != nullptr)
 		Error::abort("Trying to add a variable (" + variableName + ") when it already exists: ");
 
 	variables.emplace_back(variableName, stackSize - 1, type);
@@ -103,8 +103,8 @@ void Generator::endScope() {
 
 	stackSize -= popCount;
 
-	Generator::appendComment("Pop scope");
-	Generator::appendOutput("add rsp, " + std::to_string(popCount * Generator::stackUnitSize));
+	appendComment("Pop scope");
+	appendOutput("add rsp, " + std::to_string(popCount * stackUnitSize));
 
 	variables.resize(variables.size() - popCount);
 
@@ -112,17 +112,43 @@ void Generator::endScope() {
 }
 
 void Generator::incrementStack() {
-	Generator::appendComment("Increment stack");
-	Generator::appendOutput("sub rsp, " +
-							std::to_string(Generator::stackUnitSize));	// move top stack pointer up
+	appendComment("Increment stack");
+	appendOutput("sub rsp, " + std::to_string(stackUnitSize));	// move top stack pointer up
 	stackSize++;
 }
 
 void Generator::decrementStack() {
-	Generator::appendComment("Decrement stack");
-	Generator::appendOutput(
-		"add rsp, " + std::to_string(Generator::stackUnitSize));  // move top stack pointer down
+	appendComment("Decrement stack");
+	appendOutput("add rsp, " + std::to_string(stackUnitSize));	// move top stack pointer down
 	stackSize--;
+}
+
+void Generator::copyValueFromStackTo(const std::string &reg, int offset) {
+	std::string instruction = reg.starts_with("xmm") ? "movq" : "mov";
+	if (offset == 0) {
+		appendOutput(instruction + " " + reg + ", [rsp]");
+	} else {
+		appendOutput(instruction + " " + reg + ", [rsp + " + std::to_string(offset) + "]");
+	}
+}
+
+void Generator::copyValueToStackFrom(const std::string &reg, int offset) {
+	std::string instruction = reg.starts_with("xmm") ? "movq" : "mov";
+	if (offset == 0) {
+		appendOutput(instruction + " QWORD [rsp], " + reg);
+	} else {
+		appendOutput(instruction + " QWORD [rsp + " + std::to_string(offset) + "], " + reg);
+	}
+}
+
+void Generator::push(const std::string &reg) {
+	incrementStack();
+	copyValueToStackFrom(reg);
+}
+
+void Generator::pop(const std::string &reg) {
+	if (reg != "") copyValueFromStackTo(reg);
+	decrementStack();
 }
 
 size_t Generator::stackSize = 0;

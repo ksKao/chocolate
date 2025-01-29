@@ -21,14 +21,10 @@ void UnaryExpression::generateAssembly() {
 	switch (operand->type) {
 		case Type::NUMBER: {
 			if (op.type == TokenType::MINUS) {
-				Generator::appendOutput(
-					"movsd xmm1, QWORD [rsp]");	 // store the value from top of stack to xmm1
-				Generator::decrementStack();
+				Generator::pop("xmm1");
 				Generator::appendOutput("xorpd xmm0, xmm0");  // zero out xmm0
 				Generator::appendOutput("subpd xmm0, xmm1");  // subtract the original value from 0
-				// store the subtracted value to top of stack
-				Generator::incrementStack();
-				Generator::appendOutput("movsd QWORD [rsp], xmm0");
+				Generator::push("xmm0");
 			} else {
 				Error::abort("Unary expression " + op.getName() + " with type " +
 							 operand->getTypeName() + " is not allowed.");
@@ -37,9 +33,9 @@ void UnaryExpression::generateAssembly() {
 		}
 		case Type::BOOLEAN: {
 			if (op.type == TokenType::NOT) {
-				Generator::appendOutput("mov rax, QWORD [rsp]");
+				Generator::copyValueFromStackTo("rax");
 				Generator::appendOutput("not rax");
-				Generator::appendOutput("mov QWORD [rsp], rax");
+				Generator::copyValueToStackFrom("rax");
 			} else {
 				Error::abort("Unary expression " + op.getName() + " with type " +
 							 operand->getTypeName() + " is not allowed.");

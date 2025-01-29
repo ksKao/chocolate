@@ -21,16 +21,14 @@ void Identifier::generateAssembly() {
 	type = variable->type;
 
 	// push value to top of stack
-	Generator::incrementStack();
 	Generator::appendComment("Identifier: " + name);
 	if (type == Type::NUMBER) {
-		Generator::appendOutput("movsd xmm0, QWORD [rsp + " +
-								std::to_string(variable->getStackOffset()) + "]");
-		Generator::appendOutput("movsd QWORD [rsp], xmm0");
+		Generator::copyValueFromStackTo("xmm0", variable->getStackOffset());
+		Generator::push("xmm0");
 	} else if (type == Type::BOOLEAN) {
-		Generator::appendOutput("mov rax, QWORD [rsp + " +
-								std::to_string(variable->getStackOffset()) + "]");
-		Generator::appendOutput("mov QWORD [rsp], rax");
-	} else {
+		Generator::copyValueFromStackTo("rax", variable->getStackOffset());
+		Generator::push("rax");
+	} else if (type != Type::UNKNOWN) {
+		Error::abort("Could not handle identifier of type " + getTypeName());
 	}
 }

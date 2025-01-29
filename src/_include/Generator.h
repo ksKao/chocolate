@@ -45,6 +45,10 @@ class Generator {
 	static size_t getStackSize();
 	static void incrementStack();
 	static void decrementStack();
+	static void copyValueFromStackTo(const std::string &reg, int offset = 0);
+	static void copyValueToStackFrom(const std::string &reg, int offset = 0);
+	static void push(const std::string &reg);
+	static void pop(const std::string &reg = "");
 
   private:
 	// delete constructor for static class

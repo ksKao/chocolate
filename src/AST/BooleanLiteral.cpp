@@ -15,5 +15,5 @@ void BooleanLiteral::generateAssembly() {
 
 	Generator::incrementStack();
 	Generator::appendComment("Boolean Literal: " + valueStr);
-	Generator::appendOutput(value ? "mov QWORD [rsp], 1" : "mov QWORD [rsp], 0");
+	Generator::copyValueToStackFrom(std::to_string(value));
 }

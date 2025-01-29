@@ -18,7 +18,7 @@ void PrintStatement::generateAssembly() {
 
 	switch (value->type) {
 		case Type::NUMBER: {
-			Generator::appendOutput("movsd xmm0, QWORD [rsp]");
+			Generator::pop("xmm0");
 			Generator::appendOutput("mov rdi, float_format");
 			break;
 		}
@@ -27,7 +27,7 @@ void PrintStatement::generateAssembly() {
 			std::string doneLabel = Generator::createLabel();
 
 			Generator::appendOutput("mov rdi, string_format");
-			Generator::appendOutput("mov rax, QWORD [rsp]");
+			Generator::pop("rax");
 			Generator::appendOutput("cmp rax, 0");
 			Generator::appendOutput("je " + equalLabel);
 			Generator::appendOutput("mov rsi, true");
@@ -45,5 +45,4 @@ void PrintStatement::generateAssembly() {
 
 	Generator::appendOutput("mov rax, 1");
 	Generator::appendOutput("call printf");
-	Generator::decrementStack();
 }

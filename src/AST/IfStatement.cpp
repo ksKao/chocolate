@@ -25,9 +25,7 @@ void IfStatement::generateAssembly() {
 	std::string label = Generator::createLabel();
 
 	Generator::appendComment("If statement");
-	Generator::appendOutput("mov rax, QWORD [rsp]");
-
-	Generator::decrementStack();
+	Generator::pop("rax");
 
 	Generator::appendOutput("cmp rax, 0");
 	Generator::appendOutput("je " + label);
