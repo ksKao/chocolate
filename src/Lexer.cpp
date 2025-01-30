@@ -138,6 +138,24 @@ Token Lexer::parseSymbol() {
 			}
 			break;
 		}
+		case '|': {
+			if (peek() == '|') {
+				token = {TokenType::OR, "||"};
+				advance();
+			} else {
+				Error::abort("Invalid symbol encountered: |");
+			}
+			break;
+		}
+		case '&': {
+			if (peek() == '&') {
+				token = {TokenType::AND, "&&"};
+				advance();
+			} else {
+				Error::abort("Invalid symbol encountered: &");
+			}
+			break;
+		}
 		default:
 			std::string errorMsg("Invalid symbol encountered: ");
 			errorMsg.push_back(character);

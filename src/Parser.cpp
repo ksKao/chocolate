@@ -42,7 +42,7 @@ bool Parser::isEof() const {
 }
 
 std::unique_ptr<Expression> Parser::parseExpression() {
-	return parseComparisonExpression();
+	return parseOrExpression();
 }
 
 std::unique_ptr<Node> Parser::parseStatement() {
@@ -60,6 +60,40 @@ std::unique_ptr<Node> Parser::parseStatement() {
 		default:
 			return parseExpression();
 	}
+}
+
+std::unique_ptr<Expression> Parser::parseOrExpression() {
+	std::unique_ptr<Expression> left = parseAndExpression();
+
+	while (getToken().type == TokenType::OR) {
+		Token op = eat(TokenType::OR);
+
+		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
+		binaryExpression->left = std::move(left);
+		binaryExpression->right = parseAndExpression();
+		binaryExpression->op = op;
+
+		left = std::move(binaryExpression);
+	}
+
+	return left;
+}
+
+std::unique_ptr<Expression> Parser::parseAndExpression() {
+	std::unique_ptr<Expression> left = parseComparisonExpression();
+
+	while (getToken().type == TokenType::AND) {
+		Token op = eat(TokenType::AND);
+
+		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
+		binaryExpression->left = std::move(left);
+		binaryExpression->right = parseComparisonExpression();
+		binaryExpression->op = op;
+
+		left = std::move(binaryExpression);
+	}
+
+	return left;
 }
 
 std::unique_ptr<Expression> Parser::parseComparisonExpression() {

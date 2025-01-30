@@ -144,6 +144,17 @@ void BinaryExpression::generateAssembly() {
 			Generator::appendOutput(doneLabel + ":", false);
 			break;
 		}
+		case TokenType::OR:
+		case TokenType::AND: {
+			if (left->type != Type::BOOLEAN)
+				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+
+			type = Type::BOOLEAN;
+			std::string instruction = op.type == TokenType::OR ? "or" : "and";
+			Generator::appendOutput(instruction + " rax, rbx");
+			Generator::push("rax");
+			break;
+		}
 		default:
 			Error::abort("Operator " + op.value + " is not a valid binary operator.");
 	}
