@@ -120,6 +120,24 @@ Token Lexer::parseSymbol() {
 		case '!':
 			token = {TokenType::NOT, "!"};
 			break;
+		case '>': {
+			if (peek() == '=') {
+				token = {TokenType::GREATER_THAN_OR_EQUALS_TO, ">="};
+				advance();
+			} else {
+				token = {TokenType::GREATER_THAN, ">"};
+			}
+			break;
+		}
+		case '<': {
+			if (peek() == '=') {
+				token = {TokenType::LESS_THAN_OR_EQUALS_TO, "<="};
+				advance();
+			} else {
+				token = {TokenType::LESS_THAN, "<"};
+			}
+			break;
+		}
 		default:
 			std::string errorMsg("Invalid symbol encountered: ");
 			errorMsg.push_back(character);
