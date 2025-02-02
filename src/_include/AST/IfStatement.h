@@ -9,8 +9,7 @@
 struct IfStatement : Node {
 	std::unique_ptr<Expression> condition;
 	std::unique_ptr<Scope> scope;
-	std::optional<std::variant<std::unique_ptr<IfStatement>, std::unique_ptr<Scope>>> alternate =
-		std::nullopt;
+	std::optional<std::variant<std::unique_ptr<IfStatement>, std::unique_ptr<Scope>>> alternate = std::nullopt;
 	std::string doneLabel = "";
 
 	inline std::string getName() const override {

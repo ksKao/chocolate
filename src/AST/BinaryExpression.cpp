@@ -20,8 +20,7 @@ void BinaryExpression::generateAssembly() {
 	right->generateAssembly();
 
 	if (left->type != right->type) {
-		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " and " +
-					 right->getTypeName());
+		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " and " + right->getTypeName());
 	}
 
 	if (left->type == Type::UNKNOWN) {
@@ -133,7 +132,8 @@ void BinaryExpression::generateAssembly() {
 				{TokenType::GREATER_THAN, "ja"},
 				{TokenType::GREATER_THAN_OR_EQUALS_TO, "jae"},
 				{TokenType::LESS_THAN, "jb"},
-				{TokenType::LESS_THAN_OR_EQUALS_TO, "jbe"}};
+				{TokenType::LESS_THAN_OR_EQUALS_TO, "jbe"},
+			};
 			std::string trueLabel = Generator::createLabel();
 			std::string doneLabel = Generator::createLabel();
 			Generator::appendOutput(operationAssemblyInstruction[op.type] + " " + trueLabel);

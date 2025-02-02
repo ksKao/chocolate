@@ -26,8 +26,8 @@ void UnaryExpression::generateAssembly() {
 				Generator::appendOutput("subpd xmm0, xmm1");  // subtract the original value from 0
 				Generator::push("xmm0");
 			} else {
-				Error::abort("Unary expression " + op.getName() + " with type " +
-							 operand->getTypeName() + " is not allowed.");
+				Error::abort("Unary expression " + op.getName() + " with type " + operand->getTypeName() +
+							 " is not allowed.");
 			}
 			break;
 		}
@@ -37,14 +37,14 @@ void UnaryExpression::generateAssembly() {
 				Generator::appendOutput("not rax");
 				Generator::copyValueToStackFrom("rax");
 			} else {
-				Error::abort("Unary expression " + op.getName() + " with type " +
-							 operand->getTypeName() + " is not allowed.");
+				Error::abort("Unary expression " + op.getName() + " with type " + operand->getTypeName() +
+							 " is not allowed.");
 			}
 			break;
 		}
 		default: {
-			Error::abort("Unary expression " + op.getName() + " with type " +
-						 operand->getTypeName() + " is not allowed.");
+			Error::abort("Unary expression " + op.getName() + " with type " + operand->getTypeName() +
+						 " is not allowed.");
 			break;
 		}
 	}

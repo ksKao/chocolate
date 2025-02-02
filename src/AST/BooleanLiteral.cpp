@@ -5,8 +5,8 @@
 #include "Generator.h"
 
 void BooleanLiteral::print(const std::string& indent) const {
-	std::cout << indent << getName() << " (" << getTypeName()
-			  << "): value = " << (value ? "true" : "false") << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): value = " << (value ? "true" : "false")
+			  << std::endl;
 }
 
 void BooleanLiteral::generateAssembly() {

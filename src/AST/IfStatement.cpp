@@ -15,8 +15,7 @@ void IfStatement::print(const std::string& indent) const {
 
 	if (!alternate.has_value()) return;
 
-	if (const std::unique_ptr<Scope>* scope =
-			std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
+	if (const std::unique_ptr<Scope>* scope = std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
 		std::cout << indent << "Else: " << std::endl;
 		(**scope).print(indent + "\t");
 	} else if (const std::unique_ptr<IfStatement>* ifStatement =
@@ -33,8 +32,8 @@ void IfStatement::generateAssembly() {
 	condition->generateAssembly();
 
 	if (condition->type != Type::BOOLEAN)
-		Error::abort("Expected boolean type for if statement condition, but received " +
-					 condition->getTypeName() + " instead");
+		Error::abort("Expected boolean type for if statement condition, but received " + condition->getTypeName() +
+					 " instead");
 
 	bool isFirstIf = doneLabel == "";
 	if (isFirstIf) doneLabel = Generator::createLabel();
@@ -59,8 +58,7 @@ void IfStatement::generateAssembly() {
 				std::get_if<std::unique_ptr<IfStatement>>(&alternate.value())) {
 			(*ifStatement)->doneLabel = doneLabel;
 			(*ifStatement)->generateAssembly();
-		} else if (const std::unique_ptr<Scope>* elseScope =
-					   std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
+		} else if (const std::unique_ptr<Scope>* elseScope = std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
 			Generator::appendComment("else");
 			(*elseScope)->generateAssembly();
 		} else {

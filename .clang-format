@@ -4,7 +4,7 @@ AccessModifierOffset: -2
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
-ColumnLimit: 100
+ColumnLimit: 120
 IndentWidth: 4
 ObjCBlockIndentWidth: 4
 ReflowComments: false

@@ -15,8 +15,7 @@ void AssignmentStatement::generateAssembly() {
 	// check if identifier exists, if not, means haven't declare and can throw error
 	Variable* variable = Generator::getVariable(identifier->name);
 
-	if (variable == nullptr)
-		Error::abort(identifier->name + " has not been declared before assignment.");
+	if (variable == nullptr) Error::abort(identifier->name + " has not been declared before assignment.");
 
 	rhs->generateAssembly();
 

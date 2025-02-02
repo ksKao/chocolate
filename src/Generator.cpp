@@ -39,8 +39,7 @@ std::stringstream Generator::getOutput(Scope &program) {
 
 	outputString << "section .data" << std::endl;
 	for (size_t i = 0; i < data.size(); i++)
-		outputString << "\td" << i << ' ' << data.at(i).size << ' ' << data.at(i).value
-					 << std::endl;
+		outputString << "\td" << i << ' ' << data.at(i).size << ' ' << data.at(i).value << std::endl;
 
 	// add an entry for null
 	outputString << "\tnull DQ 0" << std::endl;
@@ -153,8 +152,7 @@ void Generator::pop(const std::string &reg) {
 
 size_t Generator::stackSize = 0;
 size_t Generator::labelCounter = 0;
-std::unique_ptr<std::vector<OutputLine>> Generator::output =
-	std::make_unique<std::vector<OutputLine>>();
+std::unique_ptr<std::vector<OutputLine>> Generator::output = std::make_unique<std::vector<OutputLine>>();
 
 // need these lines otherwise will have linking error
 std::vector<Variable> Generator::variables;

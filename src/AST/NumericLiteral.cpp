@@ -5,8 +5,7 @@
 #include "Generator.h"
 
 void NumericLiteral::print(const std::string &indent) const {
-	std::cout << indent << getName() << " (" << getTypeName() << "): value = " << value
-			  << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): value = " << value << std::endl;
 }
 
 void NumericLiteral::generateAssembly() {

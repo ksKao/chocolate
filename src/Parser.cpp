@@ -105,8 +105,7 @@ std::unique_ptr<Expression> Parser::parseComparisonExpression() {
 									   TokenType::LESS_THAN_OR_EQUALS_TO};
 
 	while (std::find_if(std::begin(comparisonOperators), std::end(comparisonOperators),
-						[token](TokenType t) { return token.type == t; }) !=
-		   std::end(comparisonOperators)) {
+						[token](TokenType t) { return token.type == t; }) != std::end(comparisonOperators)) {
 		Token op = eat();
 		token = getToken();
 
@@ -274,8 +273,7 @@ std::unique_ptr<Scope> Parser::parseScope() {
 std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 	Token identifierToken = eat(TokenType::IDENTIFIER);
 
-	std::unique_ptr<AssignmentStatement> assignmentStatement =
-		std::make_unique<AssignmentStatement>();
+	std::unique_ptr<AssignmentStatement> assignmentStatement = std::make_unique<AssignmentStatement>();
 	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
 
 	identifier->name = identifierToken.value;
