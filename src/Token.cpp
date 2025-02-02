@@ -41,6 +41,7 @@ const std::unordered_map<TokenType, std::string> Token::tokenTypeToStringMap = {
 	{TokenType::LESS_THAN_OR_EQUALS_TO, "<="},
 	{TokenType::OR, "||"},
 	{TokenType::AND, "&&"},
+	{TokenType::ELSE, "else"},
 	{TokenType::NULL_, "null"},
 	{TokenType::PRINT, "print"},
 	{TokenType::END_OF_FILE, "eof"},

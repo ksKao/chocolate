@@ -302,6 +302,17 @@ std::unique_ptr<IfStatement> Parser::parseIfStatement() {
 
 	ifStatement->scope = parseScope();
 
+	if (getToken().type == TokenType::ELSE) {
+		eat(TokenType::ELSE);
+		std::variant<std::unique_ptr<Scope>, std::unique_ptr<IfStatement>> alternate;
+
+		if (getToken().type == TokenType::IF) {
+			ifStatement->alternate.emplace(parseIfStatement());
+		} else {
+			ifStatement->alternate.emplace(parseScope());
+		}
+	}
+
 	return ifStatement;
 }
 

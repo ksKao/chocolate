@@ -27,6 +27,7 @@ enum class TokenType {
 	LESS_THAN_OR_EQUALS_TO,
 	OR,
 	AND,
+	ELSE,
 	NULL_,
 	PRINT,
 	END_OF_FILE,

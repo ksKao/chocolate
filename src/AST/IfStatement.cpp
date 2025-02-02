@@ -7,11 +7,25 @@
 
 void IfStatement::print(const std::string& indent) const {
 	std::cout << indent << getName() << ": " << std::endl;
-	std::cout << indent << "Condition: ";
+	std::cout << indent << "Condition: " << std::endl;
 
-	condition->print("");
+	condition->print(indent + "\t");
 
 	scope->print(indent + "\t");
+
+	if (!alternate.has_value()) return;
+
+	if (const std::unique_ptr<Scope>* scope =
+			std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
+		std::cout << indent << "Else: " << std::endl;
+		(**scope).print(indent + "\t");
+	} else if (const std::unique_ptr<IfStatement>* ifStatement =
+				   std::get_if<std::unique_ptr<IfStatement>>(&alternate.value())) {
+		std::cout << indent << "Else If: " << std::endl;
+		(**ifStatement).print(indent + "\t");
+	} else {
+		Error::abort("Could not print invalid else node type.");
+	}
 }
 
 void IfStatement::generateAssembly() {
@@ -22,14 +36,37 @@ void IfStatement::generateAssembly() {
 		Error::abort("Expected boolean type for if statement condition, but received " +
 					 condition->getTypeName() + " instead");
 
-	std::string label = Generator::createLabel();
+	bool isFirstIf = doneLabel == "";
+	if (isFirstIf) doneLabel = Generator::createLabel();
 
 	Generator::appendComment("If statement");
 	Generator::pop("rax");
 
 	Generator::appendOutput("cmp rax, 0");
-	Generator::appendOutput("je " + label);
 
-	scope->generateAssembly();
-	Generator::appendOutput(label + ":", false);
+	if (!alternate.has_value()) {
+		Generator::appendOutput("je " + doneLabel);
+		scope->generateAssembly();
+	} else {
+		std::string elseLabel = Generator::createLabel();
+		Generator::appendComment("else if");
+		Generator::appendOutput("je " + elseLabel);
+		scope->generateAssembly();
+		Generator::appendOutput("jmp " + doneLabel);
+		if (alternate.has_value()) Generator::appendOutput(elseLabel + ": ", false);
+
+		if (const std::unique_ptr<IfStatement>* ifStatement =
+				std::get_if<std::unique_ptr<IfStatement>>(&alternate.value())) {
+			(*ifStatement)->doneLabel = doneLabel;
+			(*ifStatement)->generateAssembly();
+		} else if (const std::unique_ptr<Scope>* elseScope =
+					   std::get_if<std::unique_ptr<Scope>>(&alternate.value())) {
+			Generator::appendComment("else");
+			(*elseScope)->generateAssembly();
+		} else {
+			Error::abort("Invalid data type for if statement alternate.");
+		}
+	}
+
+	if (isFirstIf) Generator::appendOutput(doneLabel + ":", false);
 }
