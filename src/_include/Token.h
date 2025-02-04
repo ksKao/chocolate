@@ -37,6 +37,7 @@ class Token {
   public:
 	TokenType type;
 	std::string value;
+	size_t lineNumber;
 
   public:
 	std::string getName() const;

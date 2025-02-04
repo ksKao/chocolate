@@ -24,8 +24,9 @@ Token Parser::eat(std::optional<TokenType> expectedType = std::nullopt) {
 	Token token = tokens.at(index);
 
 	if (expectedType != std::nullopt && token.type != expectedType) {
-		Error::abort("Invalid token type, expected: " + Token::getTokenName(expectedType.value()) +
-					 ", found: " + token.getName());
+		Error::abortWithLineNumber("Invalid token type, expected: `" + Token::getTokenName(expectedType.value()) +
+									   "`, found: `" + token.getName() + "`",
+								   token.lineNumber);
 		return Token();
 	}
 
@@ -177,7 +178,8 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 	switch (getToken().type) {
 		case TokenType::IDENTIFIER: {
 			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
-			identifier->name = eat(TokenType::IDENTIFIER).value;
+			Token identifierToken = eat(TokenType::IDENTIFIER);
+			identifier->token = identifierToken;
 			return identifier;
 		}
 		case TokenType::NUMBER: {
@@ -204,7 +206,8 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 			return booleanLiteral;
 		}
 		default: {
-			Error::abort("Unexpected token encountered: " + getToken().getName());
+			Token token = getToken();
+			Error::abortWithLineNumber("Unexpected token encountered: `" + token.getName() + "`", token.lineNumber);
 			return nullptr;
 		}
 	}
@@ -216,7 +219,7 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 	Token identifierToken = eat(TokenType::IDENTIFIER);	 // expects idenfifier
 
 	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
-	identifier->name = std::move(identifierToken.value);
+	identifier->token.value = std::move(identifierToken.value);
 
 	std::unique_ptr<VariableDeclarationStatement> variableDeclarationStatement =
 		std::make_unique<VariableDeclarationStatement>();
@@ -240,15 +243,17 @@ std::unique_ptr<VariableDeclarationStatement> Parser::parseVariableDeclarationSt
 		return variableDeclarationStatement;
 	}
 
-	Error::abort("Unexpected token in variable declaration after " + identifier->name +
-				 ". Expected ';' or '=', received: " + nextToken.getName());
+	Error::abortWithLineNumber("Unexpected token in variable declaration after `" + identifier->token.value +
+								   "`. Expected `;` or `=`, received: `" + nextToken.getName() + "`",
+							   nextToken.lineNumber);
 	return nullptr;
 }
 
 std::unique_ptr<PrintStatement> Parser::parsePrintStatement() {
-	eat(TokenType::PRINT);	// eat the print token
+	Token printToken = eat(TokenType::PRINT);  // eat the print token
 
 	std::unique_ptr<PrintStatement> printStatement = std::make_unique<PrintStatement>();
+	printStatement->printToken = printToken;
 	printStatement->value = parseExpression();
 
 	eat(TokenType::SEMI_COLON);
@@ -276,7 +281,7 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 	std::unique_ptr<AssignmentStatement> assignmentStatement = std::make_unique<AssignmentStatement>();
 	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
 
-	identifier->name = identifierToken.value;
+	identifier->token = identifierToken;
 
 	assignmentStatement->identifier = std::move(identifier);
 
@@ -290,10 +295,11 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
 }
 
 std::unique_ptr<IfStatement> Parser::parseIfStatement() {
-	eat(TokenType::IF);
+	Token ifToken = eat(TokenType::IF);
 	eat(TokenType::OPEN_PARENTHESIS);
 
 	std::unique_ptr<IfStatement> ifStatement = std::make_unique<IfStatement>();
+	ifStatement->ifToken = ifToken;
 	ifStatement->condition = parseExpression();
 
 	eat(TokenType::CLOSE_PARENTHESIS);

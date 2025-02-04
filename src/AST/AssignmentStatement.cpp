@@ -13,16 +13,19 @@ void AssignmentStatement::print(const std::string& indent) const {
 
 void AssignmentStatement::generateAssembly() {
 	// check if identifier exists, if not, means haven't declare and can throw error
-	Variable* variable = Generator::getVariable(identifier->name);
+	Variable* variable = Generator::getVariable(identifier->token.value);
 
-	if (variable == nullptr) Error::abort(identifier->name + " has not been declared before assignment.");
+	if (variable == nullptr)
+		Error::abortWithLineNumber(identifier->token.value + " has not been declared before assignment.",
+								   identifier->token.lineNumber);
 
 	rhs->generateAssembly();
 
 	// check for type, can only assign to same type or unknown
 	if (variable->type != Type::UNKNOWN && variable->type != rhs->type)
-		Error::abort("Could not assign " + rhs->getTypeName() + " to " +
-					 Expression::typeToStringMap.at(variable->type));
+		Error::abortWithLineNumber(
+			"Could not assign " + rhs->getTypeName() + " to " + Expression::typeToStringMap.at(variable->type),
+			identifier->token.lineNumber);
 
 	variable->type = rhs->type;
 

@@ -27,6 +27,7 @@ char Lexer::peek() const {
 }
 
 void Lexer::advance() {
+	if (getChar() == '\n') currentLineNumber++;
 	i++;
 }
 
@@ -39,7 +40,7 @@ Token Lexer::parseNumber() {
 		advance();
 	}
 
-	return {TokenType::NUMBER, value};
+	return {TokenType::NUMBER, value, currentLineNumber};
 }
 
 Token Lexer::parseWord() {
@@ -60,21 +61,21 @@ Token Lexer::parseWord() {
 				// if found keyword, can assign the token
 				if (keyword.value == value) {
 					advance();
-					return keyword;
+					return {keyword.type, keyword.value, currentLineNumber};
 				}
 			}
 
 			// reach this case means there are no matching keywords, i.e., the
 			// word is an identifier
 			advance();
-			return {TokenType::IDENTIFIER, value};
+			return {TokenType::IDENTIFIER, value, currentLineNumber};
 		}
 
 		// if no words are matched, just continue to the next character
 		advance();
 	}
 
-	Error::abort("Invalid symbol encountered: " + value);
+	Error::abortWithLineNumber("Invalid symbol encountered: " + value, currentLineNumber);
 	return {};
 }
 
@@ -144,7 +145,7 @@ Token Lexer::parseSymbol() {
 				token = {TokenType::OR, "||"};
 				advance();
 			} else {
-				Error::abort("Invalid symbol encountered: |");
+				Error::abortWithLineNumber("Invalid symbol encountered: |", currentLineNumber);
 			}
 			break;
 		}
@@ -153,18 +154,19 @@ Token Lexer::parseSymbol() {
 				token = {TokenType::AND, "&&"};
 				advance();
 			} else {
-				Error::abort("Invalid symbol encountered: &");
+				Error::abortWithLineNumber("Invalid symbol encountered: &", currentLineNumber);
 			}
 			break;
 		}
 		default:
 			std::string errorMsg("Invalid symbol encountered: ");
 			errorMsg.push_back(character);
-			Error::abort(errorMsg);
+			Error::abortWithLineNumber(errorMsg, currentLineNumber);
 			break;
 	}
 
 	advance();
+	token.lineNumber = currentLineNumber;
 	return token;
 }
 
@@ -172,14 +174,15 @@ std::vector<Token> Lexer::tokenize() {
 	std::vector<Token> tokens;
 	// reset index, in case need to use the same lexer object to tokenize multiple source code
 	i = 0;
+	currentLineNumber = 1;
 
 	while (getChar() != '\0') {
 		char character = getChar();
 
 		if (isdigit(character)) {
-			tokens.push_back(parseNumber());
+			tokens.emplace_back(parseNumber());
 		} else if (isalpha(character)) {
-			tokens.push_back(parseWord());
+			tokens.emplace_back(parseWord());
 		} else if (iswspace(character)) {  // ignore white space
 			advance();
 			continue;
@@ -187,10 +190,10 @@ std::vector<Token> Lexer::tokenize() {
 			advance();
 			while (getChar() != '\n' && getChar() != '\0') advance();
 		} else {
-			tokens.push_back(parseSymbol());
+			tokens.emplace_back(parseSymbol());
 		}
 	}
 
-	tokens.push_back({TokenType::END_OF_FILE, "EOF"});
+	tokens.push_back({TokenType::END_OF_FILE, "EOF", currentLineNumber});
 	return tokens;
 }

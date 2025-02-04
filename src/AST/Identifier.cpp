@@ -6,22 +6,22 @@
 #include "Generator.h"
 
 void Identifier::print(const std::string& indent) const {
-	std::cout << indent << getName() << " (" << getTypeName() << "): " << name << std::endl;
+	std::cout << indent << getName() << " (" << getTypeName() << "): " << token.value << std::endl;
 }
 
 void Identifier::generateAssembly() {
 	// check if identifier has already been declared
-	Variable* variable = Generator::getVariable(name);
+	Variable* variable = Generator::getVariable(token.value);
 
 	if (variable == nullptr) {
-		Error::abort("Variable " + name + " has not been declared.");
+		Error::abortWithLineNumber("Variable " + token.value + " has not been declared.", token.lineNumber);
 		return;
 	}
 
 	type = variable->type;
 
 	// push value to top of stack
-	Generator::appendComment("Identifier: " + name);
+	Generator::appendComment("Identifier: " + token.value);
 	if (type == Type::NUMBER) {
 		Generator::copyValueFromStackTo("xmm0", variable->getStackOffset());
 		Generator::push("xmm0");
@@ -29,6 +29,6 @@ void Identifier::generateAssembly() {
 		Generator::copyValueFromStackTo("rax", variable->getStackOffset());
 		Generator::push("rax");
 	} else if (type != Type::UNKNOWN) {
-		Error::abort("Could not handle identifier of type " + getTypeName());
+		Error::abortWithLineNumber("Could not handle identifier of type " + getTypeName(), token.lineNumber);
 	}
 }

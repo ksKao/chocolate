@@ -2,7 +2,7 @@
 #include "AST/Expression.h"
 
 struct Identifier : Expression {
-	std::string name;
+	Token token;
 
 	inline std::string getName() const override {
 		return "Identifier";

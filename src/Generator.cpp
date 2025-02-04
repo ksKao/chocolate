@@ -75,7 +75,7 @@ size_t Generator::getStackSize() {
 
 void Generator::addVariable(const std::string &variableName, Type type) {
 	if (getVariable(variableName) != nullptr)
-		Error::abort("Trying to add a variable (" + variableName + ") when it already exists: ");
+		Error::abort("Trying to add a variable (" + variableName + ") when it already exists. ");
 
 	variables.emplace_back(variableName, stackSize - 1, type);
 }

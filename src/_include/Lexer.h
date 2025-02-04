@@ -9,6 +9,7 @@ class Lexer {
 	Lexer(const std::string &src) : src(src) {}
 	static const std::vector<Token> keywords;  // all the reserved keywords, e.g. let, return...
 	std::vector<Token> tokenize();
+	size_t currentLineNumber;
 
   private:
 	size_t i = 0;		   // current index

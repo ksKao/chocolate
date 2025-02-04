@@ -20,11 +20,13 @@ void BinaryExpression::generateAssembly() {
 	right->generateAssembly();
 
 	if (left->type != right->type) {
-		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " and " + right->getTypeName());
+		Error::abortWithLineNumber(
+			"Could not perform " + op.value + " with " + left->getTypeName() + " and " + right->getTypeName(),
+			op.lineNumber);
 	}
 
 	if (left->type == Type::UNKNOWN) {
-		Error::abort("Could not perform " + op.value + " with unknown type");
+		Error::abortWithLineNumber("Could not perform " + op.value + " with unknown type", op.lineNumber);
 	}
 
 	// now, stack contains the values of left and right
@@ -40,14 +42,16 @@ void BinaryExpression::generateAssembly() {
 		Generator::appendComment("Getting pushed value from left and store in rax");
 		Generator::pop("rax");
 	} else {
-		Error::abort("Could not perform " + op.value + " with " + left->getTypeName() + " type");
+		Error::abortWithLineNumber("Could not perform " + op.value + " with " + left->getTypeName() + " type",
+								   op.lineNumber);
 	}
 
 	// results are always stored in xmm0
 	switch (op.type) {
 		case TokenType::PLUS: {
 			if (left->type != Type::NUMBER)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::NUMBER;
 			Generator::appendComment("Binary Operator: +");
 			Generator::appendOutput("addpd xmm0, xmm1");
@@ -56,7 +60,8 @@ void BinaryExpression::generateAssembly() {
 		}
 		case TokenType::MINUS: {
 			if (left->type != Type::NUMBER)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::NUMBER;
 			Generator::appendComment("Binary Operator: -");
 			Generator::appendOutput("subpd xmm0, xmm1");
@@ -65,7 +70,8 @@ void BinaryExpression::generateAssembly() {
 		}
 		case TokenType::MULTIPLY: {
 			if (left->type != Type::NUMBER)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::NUMBER;
 			Generator::appendComment("Binary Operator: *");
 			Generator::appendOutput("mulpd xmm0, xmm1");
@@ -74,7 +80,8 @@ void BinaryExpression::generateAssembly() {
 		}
 		case TokenType::DIVIDE: {
 			if (left->type != Type::NUMBER)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::NUMBER;
 			Generator::appendComment("Binary Operator: /");
 			Generator::appendOutput("divpd xmm0, xmm1");
@@ -83,7 +90,8 @@ void BinaryExpression::generateAssembly() {
 		}
 		case TokenType::DOUBLE_EQUALS: {
 			if (left->type != Type::NUMBER && left->type != Type::BOOLEAN)
-				Error::abort("Could not perform " + op.value + " on type" + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type" + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::BOOLEAN;
 			/*
 				_start:
@@ -123,7 +131,8 @@ void BinaryExpression::generateAssembly() {
 		case TokenType::LESS_THAN:
 		case TokenType::LESS_THAN_OR_EQUALS_TO: {
 			if (left->type != Type::NUMBER)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 			type = Type::BOOLEAN;
 			Generator::appendComment("Binary operator: " + op.value);
 			Generator::incrementStack();
@@ -147,7 +156,8 @@ void BinaryExpression::generateAssembly() {
 		case TokenType::OR:
 		case TokenType::AND: {
 			if (left->type != Type::BOOLEAN)
-				Error::abort("Could not perform " + op.value + " on type " + left->getTypeName());
+				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
+										   op.lineNumber);
 
 			type = Type::BOOLEAN;
 			std::string instruction = op.type == TokenType::OR ? "or" : "and";
@@ -156,6 +166,6 @@ void BinaryExpression::generateAssembly() {
 			break;
 		}
 		default:
-			Error::abort("Operator " + op.value + " is not a valid binary operator.");
+			Error::abortWithLineNumber("Operator " + op.value + " is not a valid binary operator.", op.lineNumber);
 	}
 }

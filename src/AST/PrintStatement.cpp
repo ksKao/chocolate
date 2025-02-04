@@ -38,7 +38,8 @@ void PrintStatement::generateAssembly() {
 			break;
 		}
 		default: {
-			Error::abort("Could not print value with " + value->getTypeName() + " type.");
+			Error::abortWithLineNumber("Could not print value with " + value->getTypeName() + " type.",
+									   printToken.lineNumber);
 			break;
 		}
 	}

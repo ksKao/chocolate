@@ -3,6 +3,7 @@
 
 struct PrintStatement : Node {
 	std::unique_ptr<Expression> value;
+	Token printToken;
 
 	inline std::string getName() const override {
 		return "Print statement";

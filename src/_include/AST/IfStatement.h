@@ -11,6 +11,7 @@ struct IfStatement : Node {
 	std::unique_ptr<Scope> scope;
 	std::optional<std::variant<std::unique_ptr<IfStatement>, std::unique_ptr<Scope>>> alternate = std::nullopt;
 	std::string doneLabel = "";
+	Token ifToken;
 
 	inline std::string getName() const override {
 		return "If Statement";

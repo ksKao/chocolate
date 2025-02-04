@@ -23,7 +23,7 @@ void IfStatement::print(const std::string& indent) const {
 		std::cout << indent << "Else If: " << std::endl;
 		(**ifStatement).print(indent + "\t");
 	} else {
-		Error::abort("Could not print invalid else node type.");
+		Error::abortWithLineNumber("Could not print invalid else node type.", ifToken.lineNumber);
 	}
 }
 
@@ -32,8 +32,10 @@ void IfStatement::generateAssembly() {
 	condition->generateAssembly();
 
 	if (condition->type != Type::BOOLEAN)
-		Error::abort("Expected boolean type for if statement condition, but received " + condition->getTypeName() +
-					 " instead");
+		// line number may not be accurate since the if token and the condition may not be on the same line, but this should be good enough
+		Error::abortWithLineNumber(
+			"Expected boolean type for if statement condition, but received " + condition->getTypeName() + " instead",
+			ifToken.lineNumber);
 
 	bool isFirstIf = doneLabel == "";
 	if (isFirstIf) doneLabel = Generator::createLabel();
@@ -62,7 +64,7 @@ void IfStatement::generateAssembly() {
 			Generator::appendComment("else");
 			(*elseScope)->generateAssembly();
 		} else {
-			Error::abort("Invalid data type for if statement alternate.");
+			Error::abortWithLineNumber("Invalid data type for if statement alternate.", ifToken.lineNumber);
 		}
 	}
 
