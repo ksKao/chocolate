@@ -28,6 +28,7 @@ enum class TokenType {
 	OR,
 	AND,
 	ELSE,
+	WHILE,
 	NULL_,
 	PRINT,
 	END_OF_FILE,
