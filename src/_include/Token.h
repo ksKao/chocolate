@@ -29,6 +29,7 @@ enum class TokenType {
 	AND,
 	ELSE,
 	WHILE,
+	FOR,
 	NULL_,
 	PRINT,
 	END_OF_FILE,

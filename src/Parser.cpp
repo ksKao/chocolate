@@ -60,6 +60,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parseIfStatement();
 		case TokenType::WHILE:
 			return parseWhileStatement();
+		case TokenType::FOR:
+			return parseForStatement();
 		default:
 			return parseExpression();
 	}
@@ -336,6 +338,27 @@ std::unique_ptr<WhileStatement> Parser::parseWhileStatement() {
 	whileStatement->scope = parseScope();
 
 	return whileStatement;
+}
+
+std::unique_ptr<ForStatement> Parser::parseForStatement() {
+	Token forToken = eat(TokenType::FOR);
+
+	eat(TokenType::OPEN_PARENTHESIS);
+
+	std::unique_ptr<ForStatement> forStatement = std::make_unique<ForStatement>();
+	forStatement->forToken = forToken;
+
+	forStatement->initStatement = parseStatement();
+	forStatement->condition = parseExpression();
+	eat(TokenType::SEMI_COLON);
+
+	forStatement->updateStatement = parseStatement();
+
+	eat(TokenType::CLOSE_PARENTHESIS);
+
+	forStatement->scope = parseScope();
+
+	return forStatement;
 }
 
 Scope Parser::parse() {

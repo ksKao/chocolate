@@ -5,13 +5,14 @@
 
 #include "AST/AssignmentStatement.h"
 #include "AST/Expression.h"
+#include "AST/ForStatement.h"
 #include "AST/IfStatement.h"
 #include "AST/PrintStatement.h"
 #include "AST/Scope.h"
+#include "AST/UnaryExpression.h"
 #include "AST/VariableDeclarationStatement.h"
 #include "AST/WhileStatement.h"
 #include "Token.h"
-#include "ast/UnaryExpression.h"
 
 class Parser {
   public:
@@ -41,4 +42,5 @@ class Parser {
 	std::unique_ptr<AssignmentStatement> parseAssignmentStatement();
 	std::unique_ptr<IfStatement> parseIfStatement();
 	std::unique_ptr<WhileStatement> parseWhileStatement();
+	std::unique_ptr<ForStatement> parseForStatement();
 };
