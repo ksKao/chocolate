@@ -3,7 +3,6 @@
 #include <optional>
 #include <vector>
 
-#include "AST/AssignmentStatement.h"
 #include "AST/Expression.h"
 #include "AST/ForStatement.h"
 #include "AST/IfStatement.h"
@@ -27,19 +26,23 @@ class Parser {
 	Token eat(std::optional<TokenType> type);
 	Token getToken() const;
 	bool isEof() const;
-	std::unique_ptr<Expression> parseExpression();
+
+	// expressions
+	std::unique_ptr<Expression> parseExpression(bool isStatement = false);
+	std::unique_ptr<Expression> parseAssignmentExpression(bool isStatement);
+	std::unique_ptr<Expression> parseOrExpression(bool isStatement);
+	std::unique_ptr<Expression> parseAndExpression(bool isStatement);
+	std::unique_ptr<Expression> parseComparisonExpression(bool isStatement);
+	std::unique_ptr<Expression> parseAdditiveExpression(bool isStatement);
+	std::unique_ptr<Expression> parseMultiplicativeExpression(bool isStatement);
+	std::unique_ptr<Expression> parseUnaryExpression(bool isStatement);
+	std::unique_ptr<Expression> parsePrimaryExpression(bool isStatement);
+
+	// statements
 	std::unique_ptr<Node> parseStatement();
-	std::unique_ptr<Expression> parseOrExpression();
-	std::unique_ptr<Expression> parseAndExpression();
-	std::unique_ptr<Expression> parseComparisonExpression();
-	std::unique_ptr<Expression> parseAdditiveExpression();
-	std::unique_ptr<Expression> parseMultiplicativeExpression();
-	std::unique_ptr<Expression> parseUnaryExpression();
-	std::unique_ptr<Expression> parsePrimaryExpression();
 	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
 	std::unique_ptr<PrintStatement> parsePrintStatement();
 	std::unique_ptr<Scope> parseScope();
-	std::unique_ptr<AssignmentStatement> parseAssignmentStatement();
 	std::unique_ptr<IfStatement> parseIfStatement();
 	std::unique_ptr<WhileStatement> parseWhileStatement();
 	std::unique_ptr<ForStatement> parseForStatement();

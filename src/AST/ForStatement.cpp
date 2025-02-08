@@ -15,7 +15,7 @@ void ForStatement::print(const std::string& indent) const {
 	condition->print(indent + "\t");
 
 	std::cout << indent << "Update Statement: " << std::endl;
-	updateStatement->print(indent + "\t");
+	updateExpression->print(indent + "\t");
 
 	scope->print(indent + "\t");
 }
@@ -35,7 +35,8 @@ void ForStatement::generateAssembly() {
 
 	Generator::startScope();
 	scope->generateAssembly();
-	updateStatement->generateAssembly();
+	updateExpression->generateAssembly();
+	Generator::pop();
 	Generator::endScope();
 
 	Generator::appendOutput(comparisonLabel + ": ", false);

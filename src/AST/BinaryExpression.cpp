@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "AST/Identifier.h"
 #include "Error.h"
 #include "Generator.h"
 
@@ -165,7 +166,58 @@ void BinaryExpression::generateAssembly() {
 			Generator::push("rax");
 			break;
 		}
+		case TokenType::EQUALS: {
+			Identifier* identifier = dynamic_cast<Identifier*>(left.get());
+
+			if (identifier == nullptr)
+				Error::abortWithLineNumber("Left side of assignment operator is not an identifier.", op.lineNumber);
+
+			// check if identifier exists, if not, means haven't declare and can throw error
+			Variable* variable = Generator::getVariable(identifier->token.value);
+
+			if (variable == nullptr)
+				Error::abortWithLineNumber(identifier->token.value + " has not been declared before assignment.",
+										   identifier->token.lineNumber);
+
+			right->generateAssembly();
+
+			// check for type, can only assign to same type or unknown
+			if (variable->type != Type::UNKNOWN && variable->type != right->type)
+				Error::abortWithLineNumber("Could not assign " + right->getTypeName() + " to " +
+											   Expression::typeToStringMap.at(variable->type),
+										   identifier->token.lineNumber);
+
+			variable->type = right->type;
+			type = right->type;
+
+			Generator::appendComment("Assigning " + variable->name + " at stack position " +
+									 std::to_string(variable->stackLocation));
+
+			std::string registerName;
+
+			switch (type) {
+				case Type::NUMBER:
+					registerName = "xmm0";
+					break;
+				case Type::BOOLEAN:
+					registerName = "rax";
+					break;
+				default:
+					Error::abortWithLineNumber("Could not handle assignment of type " + getTypeName() + " yet",
+											   op.lineNumber);
+			}
+
+			Generator::pop(registerName);
+			Generator::copyValueToStackFrom(registerName, variable->getStackOffset());
+
+			// push this because all expressions should end with pushing something to the stack
+			Generator::push(registerName);
+			break;
+		}
 		default:
 			Error::abortWithLineNumber("Operator " + op.value + " is not a valid binary operator.", op.lineNumber);
 	}
+
+	// if its a statement, no need to store the value in the stack
+	if (isStatement) Generator::pop();
 }

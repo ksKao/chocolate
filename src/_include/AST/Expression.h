@@ -6,6 +6,7 @@ enum class Type { UNKNOWN, NUMBER, BOOLEAN };
 
 struct Expression : Node {
   public:
+	bool isStatement = false;
 	Type type;
 	static const std::unordered_map<Type, std::string> typeToStringMap;
 

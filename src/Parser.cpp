@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "AST/AssignmentStatement.h"
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
 #include "AST/Identifier.h"
@@ -42,40 +41,43 @@ bool Parser::isEof() const {
 	return getToken().type == TokenType::END_OF_FILE;
 }
 
-std::unique_ptr<Expression> Parser::parseExpression() {
-	return parseOrExpression();
-}
+std::unique_ptr<Expression> Parser::parseExpression(bool isStatement) {
+	std::unique_ptr<Expression> expression = parseAssignmentExpression(isStatement);
 
-std::unique_ptr<Node> Parser::parseStatement() {
-	switch (getToken().type) {
-		case TokenType::LET:
-			return parseVariableDeclarationStatement();
-		case TokenType::PRINT:
-			return parsePrintStatement();
-		case TokenType::OPEN_CURLY:
-			return parseScope();
-		case TokenType::IDENTIFIER:
-			return parseAssignmentStatement();
-		case TokenType::IF:
-			return parseIfStatement();
-		case TokenType::WHILE:
-			return parseWhileStatement();
-		case TokenType::FOR:
-			return parseForStatement();
-		default:
-			return parseExpression();
+	if (isStatement) {
+		expression->isStatement = true;
+		eat(TokenType::SEMI_COLON);
 	}
+
+	return expression;
 }
 
-std::unique_ptr<Expression> Parser::parseOrExpression() {
-	std::unique_ptr<Expression> left = parseAndExpression();
+std::unique_ptr<Expression> Parser::parseAssignmentExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseOrExpression(isStatement);
+
+	while (getToken().type == TokenType::EQUALS) {
+		Token op = eat(TokenType::EQUALS);
+
+		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
+		binaryExpression->left = std::move(left);
+		binaryExpression->right = parseAndExpression(isStatement);
+		binaryExpression->op = op;
+
+		left = std::move(binaryExpression);
+	}
+
+	return left;
+}
+
+std::unique_ptr<Expression> Parser::parseOrExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseAndExpression(isStatement);
 
 	while (getToken().type == TokenType::OR) {
 		Token op = eat(TokenType::OR);
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseAndExpression();
+		binaryExpression->right = parseAndExpression(isStatement);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -84,15 +86,15 @@ std::unique_ptr<Expression> Parser::parseOrExpression() {
 	return left;
 }
 
-std::unique_ptr<Expression> Parser::parseAndExpression() {
-	std::unique_ptr<Expression> left = parseComparisonExpression();
+std::unique_ptr<Expression> Parser::parseAndExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseComparisonExpression(isStatement);
 
 	while (getToken().type == TokenType::AND) {
 		Token op = eat(TokenType::AND);
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseComparisonExpression();
+		binaryExpression->right = parseComparisonExpression(isStatement);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -101,8 +103,8 @@ std::unique_ptr<Expression> Parser::parseAndExpression() {
 	return left;
 }
 
-std::unique_ptr<Expression> Parser::parseComparisonExpression() {
-	std::unique_ptr<Expression> left = parseAdditiveExpression();
+std::unique_ptr<Expression> Parser::parseComparisonExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseAdditiveExpression(isStatement);
 
 	Token token = getToken();
 	TokenType comparisonOperators[] = {TokenType::DOUBLE_EQUALS, TokenType::GREATER_THAN,
@@ -116,7 +118,7 @@ std::unique_ptr<Expression> Parser::parseComparisonExpression() {
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseAdditiveExpression();
+		binaryExpression->right = parseAdditiveExpression(isStatement);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -125,8 +127,8 @@ std::unique_ptr<Expression> Parser::parseComparisonExpression() {
 	return left;
 }
 
-std::unique_ptr<Expression> Parser::parseAdditiveExpression() {
-	std::unique_ptr<Expression> left = parseMultiplicativeExpression();
+std::unique_ptr<Expression> Parser::parseAdditiveExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseMultiplicativeExpression(isStatement);
 
 	// use while loop here to handle chaining multiple operators, e.g. 1 + 2 + 3
 	while (getToken().type == TokenType::PLUS || getToken().type == TokenType::MINUS) {
@@ -134,7 +136,7 @@ std::unique_ptr<Expression> Parser::parseAdditiveExpression() {
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseMultiplicativeExpression();
+		binaryExpression->right = parseMultiplicativeExpression(isStatement);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -143,15 +145,15 @@ std::unique_ptr<Expression> Parser::parseAdditiveExpression() {
 	return left;
 }
 
-std::unique_ptr<Expression> Parser::parseMultiplicativeExpression() {
-	std::unique_ptr<Expression> left = parseUnaryExpression();
+std::unique_ptr<Expression> Parser::parseMultiplicativeExpression(bool isStatement) {
+	std::unique_ptr<Expression> left = parseUnaryExpression(isStatement);
 
 	while (getToken().type == TokenType::MULTIPLY || getToken().type == TokenType::DIVIDE) {
 		Token op = eat();
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseUnaryExpression();
+		binaryExpression->right = parseUnaryExpression(isStatement);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -160,7 +162,7 @@ std::unique_ptr<Expression> Parser::parseMultiplicativeExpression() {
 	return left;
 }
 
-std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+std::unique_ptr<Expression> Parser::parseUnaryExpression(bool isStatement) {
 	Token token = getToken();
 
 	switch (token.type) {
@@ -168,17 +170,17 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression() {
 		case TokenType::NOT: {
 			Token op = eat();
 			std::unique_ptr<UnaryExpression> unaryExpression = std::make_unique<UnaryExpression>();
-			unaryExpression->operand = parsePrimaryExpression();
+			unaryExpression->operand = parsePrimaryExpression(isStatement);
 			unaryExpression->op = op;
 			return unaryExpression;
 		}
 		default: {
-			return parsePrimaryExpression();
+			return parsePrimaryExpression(isStatement);
 		}
 	}
 }
 
-std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
+std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 	switch (getToken().type) {
 		case TokenType::IDENTIFIER: {
 			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
@@ -214,6 +216,27 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 			Error::abortWithLineNumber("Unexpected token encountered: `" + token.getName() + "`", token.lineNumber);
 			return nullptr;
 		}
+	}
+}
+
+std::unique_ptr<Node> Parser::parseStatement() {
+	Token token = getToken();
+
+	switch (token.type) {
+		case TokenType::LET:
+			return parseVariableDeclarationStatement();
+		case TokenType::PRINT:
+			return parsePrintStatement();
+		case TokenType::OPEN_CURLY:
+			return parseScope();
+		case TokenType::IF:
+			return parseIfStatement();
+		case TokenType::WHILE:
+			return parseWhileStatement();
+		case TokenType::FOR:
+			return parseForStatement();
+		default:
+			return parseExpression(true);
 	}
 }
 
@@ -279,25 +302,6 @@ std::unique_ptr<Scope> Parser::parseScope() {
 	return scope;
 }
 
-std::unique_ptr<AssignmentStatement> Parser::parseAssignmentStatement() {
-	Token identifierToken = eat(TokenType::IDENTIFIER);
-
-	std::unique_ptr<AssignmentStatement> assignmentStatement = std::make_unique<AssignmentStatement>();
-	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
-
-	identifier->token = identifierToken;
-
-	assignmentStatement->identifier = std::move(identifier);
-
-	eat(TokenType::EQUALS);
-
-	assignmentStatement->rhs = parseExpression();
-
-	eat(TokenType::SEMI_COLON);
-
-	return assignmentStatement;
-}
-
 std::unique_ptr<IfStatement> Parser::parseIfStatement() {
 	Token ifToken = eat(TokenType::IF);
 	eat(TokenType::OPEN_PARENTHESIS);
@@ -352,7 +356,7 @@ std::unique_ptr<ForStatement> Parser::parseForStatement() {
 	forStatement->condition = parseExpression();
 	eat(TokenType::SEMI_COLON);
 
-	forStatement->updateStatement = parseStatement();
+	forStatement->updateExpression = parseExpression();
 
 	eat(TokenType::CLOSE_PARENTHESIS);
 

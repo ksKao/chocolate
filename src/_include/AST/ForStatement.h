@@ -6,7 +6,7 @@
 struct ForStatement : Node {
 	std::unique_ptr<Node> initStatement;
 	std::unique_ptr<Expression> condition;
-	std::unique_ptr<Node> updateStatement;
+	std::unique_ptr<Expression> updateExpression;
 	std::unique_ptr<Scope> scope;
 	Token forToken;
 
