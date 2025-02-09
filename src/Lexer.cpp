@@ -94,10 +94,20 @@ Token Lexer::parseSymbol() {
 			}
 			break;
 		case '+':
-			token = {TokenType::PLUS, "+"};
+			if (peek() == '+') {
+				token = {TokenType::INCREMENT, "++"};
+				advance();
+			} else {
+				token = {TokenType::PLUS, "+"};
+			}
 			break;
 		case '-':
-			token = {TokenType::MINUS, "-"};
+			if (peek() == '-') {
+				token = {TokenType::DECREMENT, "--"};
+				advance();
+			} else {
+				token = {TokenType::MINUS, "-"};
+			}
 			break;
 		case '*':
 			token = {TokenType::MULTIPLY, "*"};

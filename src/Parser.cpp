@@ -6,6 +6,7 @@
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
 #include "AST/Identifier.h"
+#include "AST/IncrementDecrementExpression.h"
 #include "AST/NullLiteral.h"
 #include "AST/NumericLiteral.h"
 #include "AST/PrintStatement.h"
@@ -179,13 +180,40 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(bool isStatement) {
 		case TokenType::NOT: {
 			Token op = eat();
 			std::unique_ptr<UnaryExpression> unaryExpression = std::make_unique<UnaryExpression>();
-			unaryExpression->operand = parsePrimaryExpression(false);
+			unaryExpression->operand = parseIncrementDecrementExpression(false);
 			unaryExpression->op = op;
 			return unaryExpression;
 		}
 		default: {
-			return parsePrimaryExpression(isStatement);
+			return parseIncrementDecrementExpression(isStatement);
 		}
+	}
+}
+
+std::unique_ptr<Expression> Parser::parseIncrementDecrementExpression(bool isStatement) {
+	Token token = getToken();
+
+	if (token.type == TokenType::INCREMENT || token.type == TokenType::DECREMENT) {
+		std::unique_ptr<IncrementDecrementExpression> incrementDecrementExpression =
+			std::make_unique<IncrementDecrementExpression>();
+
+		incrementDecrementExpression->op = eat();
+		incrementDecrementExpression->identifier = parseIdentifier(false);
+		incrementDecrementExpression->isStatement = isStatement;
+		incrementDecrementExpression->isPrefix = true;
+		return incrementDecrementExpression;
+	} else if (token.type == TokenType::IDENTIFIER &&
+			   (getToken(1).type == TokenType::INCREMENT || getToken(1).type == TokenType::DECREMENT)) {
+		std::unique_ptr<IncrementDecrementExpression> incrementDecrementExpression =
+			std::make_unique<IncrementDecrementExpression>();
+
+		incrementDecrementExpression->identifier = parseIdentifier(false);
+		incrementDecrementExpression->op = eat();
+		incrementDecrementExpression->isStatement = isStatement;
+		incrementDecrementExpression->isPrefix = false;
+		return incrementDecrementExpression;
+	} else {
+		return parsePrimaryExpression(isStatement);
 	}
 }
 

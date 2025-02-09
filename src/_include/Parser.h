@@ -36,6 +36,7 @@ class Parser {
 	std::unique_ptr<Expression> parseAdditiveExpression(bool isStatement);
 	std::unique_ptr<Expression> parseMultiplicativeExpression(bool isStatement);
 	std::unique_ptr<Expression> parseUnaryExpression(bool isStatement);
+	std::unique_ptr<Expression> parseIncrementDecrementExpression(bool isStatement);
 	std::unique_ptr<Expression> parsePrimaryExpression(bool isStatement);
 	std::unique_ptr<Identifier> parseIdentifier(bool isStatement);
 

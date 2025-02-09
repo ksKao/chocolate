@@ -42,7 +42,10 @@ std::stringstream Generator::getOutput(Scope &program) {
 		outputString << "\td" << i << ' ' << data.at(i).size << ' ' << data.at(i).value << std::endl;
 
 	// add an entry for null
-	outputString << "\tnull DQ 0" << std::endl;
+	outputString << "\tnull DQ 0.0" << std::endl;
+
+	// add an entry for 1 (used for increment/decrement)
+	outputString << "\tone DQ 1.0" << std::endl;
 
 	// setup for printf
 	outputString << "\tfloat_format db `%f\\n`, 0" << std::endl;

@@ -48,8 +48,6 @@ void AssignmentExpression::generateAssembly() {
 			Error::abortWithLineNumber("Could not handle assignment of type " + getTypeName() + " yet", op.lineNumber);
 	}
 
-	Generator::pop(registerName);
+	if (isStatement) Generator::pop(registerName);
 	Generator::copyValueToStackFrom(registerName, variable->getStackOffset());
-
-	if (!isStatement) Generator::push(registerName);
 }

@@ -30,6 +30,8 @@ enum class TokenType {
 	ELSE,
 	WHILE,
 	FOR,
+	INCREMENT,
+	DECREMENT,
 	NULL_,
 	PRINT,
 	END_OF_FILE,

@@ -20,6 +20,8 @@ void Identifier::generateAssembly() {
 
 	type = variable->type;
 
+	if (isStatement) return;
+
 	// push value to top of stack
 	Generator::appendComment("Identifier: " + token.value);
 	if (type == Type::NUMBER) {

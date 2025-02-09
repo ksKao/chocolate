@@ -44,6 +44,8 @@ const std::unordered_map<TokenType, std::string> Token::tokenTypeToStringMap = {
 	{TokenType::ELSE, "else"},
 	{TokenType::WHILE, "while"},
 	{TokenType::FOR, "for"},
+	{TokenType::INCREMENT, "++"},
+	{TokenType::DECREMENT, "--"},
 	{TokenType::NULL_, "null"},
 	{TokenType::PRINT, "print"},
 	{TokenType::END_OF_FILE, "eof"},

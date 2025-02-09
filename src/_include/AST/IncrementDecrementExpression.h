@@ -1,15 +1,14 @@
-#pragma once
-
 #include "AST/Expression.h"
 #include "AST/Identifier.h"
 
-struct AssignmentExpression : Expression {
+// different from unary because the operand must be an identifier
+struct IncrementDecrementExpression : Expression {
 	std::unique_ptr<Identifier> identifier;
-	std::unique_ptr<Expression> right;
 	Token op;
+	bool isPrefix;
 
 	inline std::string getName() const override {
-		return "Assignment Expression";
+		return "Increment Decrement Expression";
 	}
 	void print(const std::string &indent) const override;
 	void generateAssembly() override;
