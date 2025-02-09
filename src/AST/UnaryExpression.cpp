@@ -16,7 +16,12 @@ void UnaryExpression::generateAssembly() {
 
 	type = operand->type;
 
+	if (isStatement) return;
+
 	Generator::appendComment("Unary operator: " + op.getName());
+
+	std::string errorMessage =
+		"Unary expression " + op.getName() + " with type " + operand->getTypeName() + " is not allowed.";
 
 	switch (operand->type) {
 		case Type::NUMBER: {
@@ -26,9 +31,7 @@ void UnaryExpression::generateAssembly() {
 				Generator::appendOutput("subpd xmm0, xmm1");  // subtract the original value from 0
 				Generator::push("xmm0");
 			} else {
-				Error::abortWithLineNumber(
-					"Unary expression " + op.getName() + " with type " + operand->getTypeName() + " is not allowed.",
-					op.lineNumber);
+				Error::abortWithLineNumber(errorMessage, op.lineNumber);
 			}
 			break;
 		}
@@ -38,16 +41,12 @@ void UnaryExpression::generateAssembly() {
 				Generator::appendOutput("not rax");
 				Generator::copyValueToStackFrom("rax");
 			} else {
-				Error::abortWithLineNumber(
-					"Unary expression " + op.getName() + " with type " + operand->getTypeName() + " is not allowed.",
-					op.lineNumber);
+				Error::abortWithLineNumber(errorMessage, op.lineNumber);
 			}
 			break;
 		}
 		default: {
-			Error::abortWithLineNumber(
-				"Unary expression " + op.getName() + " with type " + operand->getTypeName() + " is not allowed.",
-				op.lineNumber);
+			Error::abortWithLineNumber(errorMessage, op.lineNumber);
 			break;
 		}
 	}

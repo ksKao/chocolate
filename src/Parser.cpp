@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "AST/AssignmentExpression.h"
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
 #include "AST/Identifier.h"
@@ -33,8 +34,16 @@ Token Parser::eat(std::optional<TokenType> expectedType = std::nullopt) {
 	return token;
 }
 
-Token Parser::getToken() const {
-	return tokens.at(index);
+Token Parser::getToken(int advance) const {
+	int indexToGet = index + advance;
+
+	if (indexToGet < 0 || indexToGet >= tokens.size()) {
+		Error::abort("Could not get token at index " + std::to_string(indexToGet) + ". Valid range is 0 - " +
+					 std::to_string(tokens.size() - 1));
+		return Token();
+	}
+
+	return tokens.at(indexToGet);
 }
 
 bool Parser::isEof() const {
@@ -53,20 +62,20 @@ std::unique_ptr<Expression> Parser::parseExpression(bool isStatement) {
 }
 
 std::unique_ptr<Expression> Parser::parseAssignmentExpression(bool isStatement) {
-	std::unique_ptr<Expression> left = parseOrExpression(isStatement);
-
-	while (getToken().type == TokenType::EQUALS) {
+	if (getToken().type == TokenType::IDENTIFIER && getToken(1).type == TokenType::EQUALS) {
+		std::unique_ptr<Identifier> identifier = parseIdentifier(false);
 		Token op = eat(TokenType::EQUALS);
 
-		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
-		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseAndExpression(isStatement);
-		binaryExpression->op = op;
+		std::unique_ptr<AssignmentExpression> assignmentExpression = std::make_unique<AssignmentExpression>();
+		assignmentExpression->identifier = std::move(identifier);
+		assignmentExpression->right = parseOrExpression(false);
+		assignmentExpression->isStatement = isStatement;
+		assignmentExpression->op = op;
 
-		left = std::move(binaryExpression);
+		return assignmentExpression;
+	} else {
+		return parseOrExpression(isStatement);
 	}
-
-	return left;
 }
 
 std::unique_ptr<Expression> Parser::parseOrExpression(bool isStatement) {
@@ -77,7 +86,7 @@ std::unique_ptr<Expression> Parser::parseOrExpression(bool isStatement) {
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseAndExpression(isStatement);
+		binaryExpression->right = parseAndExpression(false);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -94,7 +103,7 @@ std::unique_ptr<Expression> Parser::parseAndExpression(bool isStatement) {
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseComparisonExpression(isStatement);
+		binaryExpression->right = parseComparisonExpression(false);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -118,7 +127,7 @@ std::unique_ptr<Expression> Parser::parseComparisonExpression(bool isStatement) 
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseAdditiveExpression(isStatement);
+		binaryExpression->right = parseAdditiveExpression(false);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -136,7 +145,7 @@ std::unique_ptr<Expression> Parser::parseAdditiveExpression(bool isStatement) {
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseMultiplicativeExpression(isStatement);
+		binaryExpression->right = parseMultiplicativeExpression(false);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -153,7 +162,7 @@ std::unique_ptr<Expression> Parser::parseMultiplicativeExpression(bool isStateme
 
 		std::unique_ptr<BinaryExpression> binaryExpression = std::make_unique<BinaryExpression>();
 		binaryExpression->left = std::move(left);
-		binaryExpression->right = parseUnaryExpression(isStatement);
+		binaryExpression->right = parseUnaryExpression(false);
 		binaryExpression->op = op;
 
 		left = std::move(binaryExpression);
@@ -170,7 +179,7 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(bool isStatement) {
 		case TokenType::NOT: {
 			Token op = eat();
 			std::unique_ptr<UnaryExpression> unaryExpression = std::make_unique<UnaryExpression>();
-			unaryExpression->operand = parsePrimaryExpression(isStatement);
+			unaryExpression->operand = parsePrimaryExpression(false);
 			unaryExpression->op = op;
 			return unaryExpression;
 		}
@@ -183,19 +192,18 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(bool isStatement) {
 std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 	switch (getToken().type) {
 		case TokenType::IDENTIFIER: {
-			std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
-			Token identifierToken = eat(TokenType::IDENTIFIER);
-			identifier->token = identifierToken;
-			return identifier;
+			return parseIdentifier(isStatement);
 		}
 		case TokenType::NUMBER: {
 			std::unique_ptr<NumericLiteral> numericLiteral = std::make_unique<NumericLiteral>();
 			numericLiteral->value = std::stof(eat(TokenType::NUMBER).value);
+			numericLiteral->isStatement = isStatement;
 			return numericLiteral;
 		}
 		case TokenType::OPEN_PARENTHESIS: {
 			eat(TokenType::OPEN_PARENTHESIS);
 			std::unique_ptr<Expression> result = parseExpression();
+			result->isStatement = isStatement;
 			eat(TokenType::CLOSE_PARENTHESIS);
 			return result;
 		}
@@ -203,12 +211,14 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 			eat(TokenType::TRUE);
 			std::unique_ptr<BooleanLiteral> booleanLiteral = std::make_unique<BooleanLiteral>();
 			booleanLiteral->value = true;
+			booleanLiteral->isStatement = isStatement;
 			return booleanLiteral;
 		}
 		case TokenType::FALSE: {
 			eat(TokenType::FALSE);
 			std::unique_ptr<BooleanLiteral> booleanLiteral = std::make_unique<BooleanLiteral>();
 			booleanLiteral->value = false;
+			booleanLiteral->isStatement = isStatement;
 			return booleanLiteral;
 		}
 		default: {
@@ -217,6 +227,14 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 			return nullptr;
 		}
 	}
+}
+
+std::unique_ptr<Identifier> Parser::parseIdentifier(bool isStatement) {
+	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
+	Token identifierToken = eat(TokenType::IDENTIFIER);
+	identifier->token = identifierToken;
+	identifier->isStatement = isStatement;
+	return identifier;
 }
 
 std::unique_ptr<Node> Parser::parseStatement() {

@@ -24,7 +24,7 @@ class Parser {
 
   private:
 	Token eat(std::optional<TokenType> type);
-	Token getToken() const;
+	Token getToken(int advance = 0) const;
 	bool isEof() const;
 
 	// expressions
@@ -37,6 +37,7 @@ class Parser {
 	std::unique_ptr<Expression> parseMultiplicativeExpression(bool isStatement);
 	std::unique_ptr<Expression> parseUnaryExpression(bool isStatement);
 	std::unique_ptr<Expression> parsePrimaryExpression(bool isStatement);
+	std::unique_ptr<Identifier> parseIdentifier(bool isStatement);
 
 	// statements
 	std::unique_ptr<Node> parseStatement();

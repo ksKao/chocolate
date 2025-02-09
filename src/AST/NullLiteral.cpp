@@ -9,9 +9,9 @@ void NullLiteral::print(const std::string &indent) const {
 }
 
 void NullLiteral::generateAssembly() {
-	// Generator::incrementStack();
+	if (isStatement) return;
+
 	Generator::appendComment("Null literal");
 	Generator::appendOutput("movq xmm0, [null]");
 	Generator::push("xmm0");
-	// Generator::appendOutput("movsd QWORD [rsp], [null]");
 }

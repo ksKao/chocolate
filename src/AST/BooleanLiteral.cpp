@@ -10,6 +10,8 @@ void BooleanLiteral::print(const std::string& indent) const {
 }
 
 void BooleanLiteral::generateAssembly() {
+	if (isStatement) return;
+
 	type = Type::BOOLEAN;
 	std::string valueStr = std::to_string(value);
 

@@ -10,6 +10,9 @@ void NumericLiteral::print(const std::string &indent) const {
 
 void NumericLiteral::generateAssembly() {
 	type = Type::NUMBER;
+
+	if (isStatement) return;
+
 	std::string valueStr = std::to_string(value);
 
 	std::string dataName = Generator::getDataName(valueStr);
