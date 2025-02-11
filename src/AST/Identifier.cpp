@@ -24,13 +24,17 @@ void Identifier::generateAssembly() {
 
 	// push value to top of stack
 	Generator::appendComment("Identifier: " + token.value);
-	if (type == Type::NUMBER) {
-		Generator::copyValueFromStackTo("xmm0", variable->getStackOffset());
-		Generator::push("xmm0");
-	} else if (type == Type::BOOLEAN) {
-		Generator::copyValueFromStackTo("rax", variable->getStackOffset());
-		Generator::push("rax");
-	} else if (type != Type::UNKNOWN) {
-		Error::abortWithLineNumber("Could not handle identifier of type " + getTypeName(), token.lineNumber);
+	switch (type) {
+		case Type::NUMBER:
+			Generator::copyValueFromStackTo("xmm0", variable->getStackOffset());
+			Generator::push("xmm0");
+			break;
+		case Type::BOOLEAN:
+		case Type::STRING:
+			Generator::copyValueFromStackTo("rax", variable->getStackOffset());
+			Generator::push("rax");
+			break;
+		default:
+			Error::abortWithLineNumber("Could not handle identifier of type " + getTypeName(), token.lineNumber);
 	}
 }

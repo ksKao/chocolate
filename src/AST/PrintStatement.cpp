@@ -37,6 +37,11 @@ void PrintStatement::generateAssembly() {
 			Generator::appendOutput(doneLabel + ":", false);
 			break;
 		}
+		case Type::STRING: {
+			Generator::appendOutput("mov rdi, string_format");
+			Generator::pop("rsi");
+			break;
+		}
 		default: {
 			Error::abortWithLineNumber("Could not print value with " + value->getTypeName() + " type.",
 									   printToken.lineNumber);

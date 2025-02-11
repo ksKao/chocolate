@@ -42,6 +42,7 @@ void AssignmentExpression::generateAssembly() {
 			registerName = "xmm0";
 			break;
 		case Type::BOOLEAN:
+		case Type::STRING:
 			registerName = "rax";
 			break;
 		default:

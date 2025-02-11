@@ -169,6 +169,22 @@ Token Lexer::parseSymbol() {
 			}
 			break;
 		}
+		case '\"': {
+			advance();
+
+			std::string string = "";
+			char currentChar = getChar();
+
+			while (currentChar != '\"') {
+				if (currentChar == '\0') Error::abortWithLineNumber("Expected `\"`", currentLineNumber);
+
+				string.push_back(currentChar);
+				advance();
+				currentChar = getChar();
+			}
+			token = {TokenType::STRING, string};
+			break;
+		}
 		default:
 			std::string errorMsg("Invalid symbol encountered: ");
 			errorMsg.push_back(character);

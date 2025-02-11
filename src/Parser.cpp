@@ -11,6 +11,7 @@
 #include "AST/NumericLiteral.h"
 #include "AST/PrintStatement.h"
 #include "AST/Scope.h"
+#include "AST/StringLiteral.h"
 #include "Error.h"
 #include "Token.h"
 
@@ -248,6 +249,13 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 			booleanLiteral->value = false;
 			booleanLiteral->isStatement = isStatement;
 			return booleanLiteral;
+		}
+		case TokenType::STRING: {
+			Token token = eat(TokenType::STRING);
+			std::unique_ptr<StringLiteral> stringLiteral = std::make_unique<StringLiteral>();
+			stringLiteral->value = token.value;
+			stringLiteral->isStatement = isStatement;
+			return stringLiteral;
 		}
 		default: {
 			Token token = getToken();

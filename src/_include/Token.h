@@ -32,6 +32,7 @@ enum class TokenType {
 	FOR,
 	INCREMENT,
 	DECREMENT,
+	STRING,
 	NULL_,
 	PRINT,
 	END_OF_FILE,
