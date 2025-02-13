@@ -37,7 +37,7 @@ void BinaryExpression::generateAssembly() {
 		Generator::pop("xmm1");
 		Generator::appendComment("Getting pushed value from left and store in xmm0");
 		Generator::pop("xmm0");
-	} else if (right->type == Type::BOOLEAN) {
+	} else if (left->type == Type::BOOLEAN || left->type == Type::STRING) {
 		Generator::appendComment("Getting pushed value from right and store in rbx");
 		Generator::pop("rbx");
 		Generator::appendComment("Getting pushed value from left and store in rax");
@@ -50,13 +50,51 @@ void BinaryExpression::generateAssembly() {
 	// results are always stored in xmm0
 	switch (op.type) {
 		case TokenType::PLUS: {
-			if (left->type != Type::NUMBER)
+			Generator::appendComment("Binary Operator: +");
+			if (left->type == Type::NUMBER) {
+				type = Type::NUMBER;
+				Generator::appendOutput("addpd xmm0, xmm1");
+				Generator::push("xmm0");
+			} else if (left->type == Type::STRING) {
+				type = Type::STRING;
+				Generator::appendComment(
+					"Move rax to rdx because rax will be used for returning values for other c functions");
+				Generator::appendOutput("mov r12, rax");
+
+				Generator::appendComment("Calculate length of left string");
+				Generator::appendOutput("mov rdi, r12");
+				Generator::appendOutput("call strlen");
+				Generator::appendOutput("mov r8, rax");	 // strlen stores result in rax
+
+				Generator::appendComment("Calculate length of right string");
+				Generator::appendOutput("mov rdi, rbx");
+				Generator::appendOutput("call strlen");
+				Generator::appendOutput("mov r9, rax");
+
+				Generator::appendComment(
+					"Allocate memory using malloc for the sum of both lengths + 1 for the null terminator");
+				Generator::appendOutput("add r8, r9");
+				Generator::appendOutput("inc r8");
+				Generator::appendOutput("mov rdi, r8");
+				Generator::appendOutput("call malloc");
+
+				Generator::appendComment("Store the allocated memory pointer in the result");
+				Generator::appendOutput("mov rdi, rax");
+
+				Generator::appendComment("Copy string1 into the allocated memory (using strcpy)");
+				Generator::appendOutput("mov rsi, r12");
+				Generator::appendOutput("call strcpy");
+
+				Generator::appendComment("Copy string2 into the allocated memory (using strcat)");
+				Generator::appendOutput("mov rsi, rbx");
+				Generator::appendOutput("call strcat");
+
+				Generator::appendComment("At this point, the memory pointed by rax contains the concatenated string.");
+				Generator::push("rax");
+			} else {
 				Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
 										   op.lineNumber);
-			type = Type::NUMBER;
-			Generator::appendComment("Binary Operator: +");
-			Generator::appendOutput("addpd xmm0, xmm1");
-			Generator::push("xmm0");
+			}
 			break;
 		}
 		case TokenType::MINUS: {

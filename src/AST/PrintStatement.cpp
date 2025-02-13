@@ -20,6 +20,7 @@ void PrintStatement::generateAssembly() {
 		case Type::NUMBER: {
 			Generator::pop("xmm0");
 			Generator::appendOutput("mov rdi, float_format");
+			Generator::appendOutput("mov rax, 1");
 			break;
 		}
 		case Type::BOOLEAN: {
@@ -35,11 +36,13 @@ void PrintStatement::generateAssembly() {
 			Generator::appendOutput(equalLabel + ":", false);
 			Generator::appendOutput("mov rsi, false");
 			Generator::appendOutput(doneLabel + ":", false);
+			Generator::appendOutput("mov rax, 0");
 			break;
 		}
 		case Type::STRING: {
 			Generator::appendOutput("mov rdi, string_format");
 			Generator::pop("rsi");
+			Generator::appendOutput("mov rax, 0");
 			break;
 		}
 		default: {
@@ -49,6 +52,5 @@ void PrintStatement::generateAssembly() {
 		}
 	}
 
-	Generator::appendOutput("mov rax, 1");
 	Generator::appendOutput("call printf");
 }
