@@ -58,7 +58,8 @@ void BinaryExpression::generateAssembly() {
 			} else if (left->type == Type::STRING) {
 				type = Type::STRING;
 				Generator::appendComment(
-					"Move rax to rdx because rax will be used for returning values for other c functions");
+					"Move rax to r12 because rax will be used for returning values for other c functions. Also can't "
+					"use other registers because they are callee-saved");
 				Generator::appendOutput("mov r12, rax");
 
 				Generator::appendComment("Calculate length of left string");
@@ -128,7 +129,7 @@ void BinaryExpression::generateAssembly() {
 			break;
 		}
 		case TokenType::DOUBLE_EQUALS: {
-			if (left->type != Type::NUMBER && left->type != Type::BOOLEAN)
+			if (left->type != Type::NUMBER && left->type != Type::BOOLEAN && left->type != Type::STRING)
 				Error::abortWithLineNumber("Could not perform " + op.value + " on type" + left->getTypeName(),
 										   op.lineNumber);
 			type = Type::BOOLEAN;
@@ -153,7 +154,14 @@ void BinaryExpression::generateAssembly() {
 			Generator::appendComment("Binary Operator: ==");
 			Generator::incrementStack();
 			if (left->type == Type::BOOLEAN) Generator::appendOutput("cmp rax, rbx");
-			else Generator::appendOutput("comisd xmm0, xmm1");
+			else if (left->type == Type::NUMBER) Generator::appendOutput("comisd xmm0, xmm1");
+			else {
+				Generator::appendOutput("mov rdi, rax");
+				Generator::appendOutput("mov rsi, rbx");
+				Generator::appendOutput("call strcmp");
+				// if 0 means same, can also be > 0 or < 0, but that does not matter here
+				Generator::appendOutput("cmp rax, 0");
+			}
 
 			std::string equalLabel = Generator::createLabel();
 			std::string doneLabel = Generator::createLabel();

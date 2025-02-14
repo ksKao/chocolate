@@ -23,7 +23,7 @@ std::stringstream Generator::getOutput(Scope &program) {
 	appendOutput("section .text", false);
 	appendOutput("global main");
 	appendOutput("default rel");
-	appendOutput("extern printf, strlen, strcat, strcpy, malloc");
+	appendOutput("extern printf, strlen, strcat, strcpy, strcmp, malloc");
 	appendOutput("");
 
 	appendOutput("main:", false);
