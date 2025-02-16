@@ -19,7 +19,7 @@ void PrintStatement::generateAssembly() {
 	switch (value->type) {
 		case Type::NUMBER: {
 			Generator::pop("xmm0");
-			Generator::appendOutput("mov rdi, float_format");
+			Generator::appendOutput("mov rdi, float_format_endl");
 			Generator::appendOutput("mov rax, 1");
 			break;
 		}

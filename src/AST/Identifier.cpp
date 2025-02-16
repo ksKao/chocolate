@@ -34,7 +34,5 @@ void Identifier::generateAssembly() {
 			Generator::copyValueFromStackTo("rax", variable->getStackOffset());
 			Generator::push("rax");
 			break;
-		default:
-			Error::abortWithLineNumber("Could not handle identifier of type " + getTypeName(), token.lineNumber);
 	}
 }

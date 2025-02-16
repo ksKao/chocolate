@@ -21,10 +21,6 @@ void BinaryExpression::generateAssembly() {
 	Generator::appendComment("Generating right assembly");
 	right->generateAssembly();
 
-	if (left->type == Type::UNKNOWN || right->type == Type::UNKNOWN) {
-		Error::abortWithLineNumber("Could not perform " + op.value + " with unknown type", op.lineNumber);
-	}
-
 	// now, stack contains the values of left and right
 	// pop them off and store them in different registers depending on their data types
 	if (right->type == Type::NUMBER) {
@@ -86,56 +82,102 @@ void BinaryExpression::abortWithTypeError() {
 
 void BinaryExpression::handlePlus() {
 	Generator::appendComment("Binary Operator: +");
-	switch (left->type) {
-		case Type::NUMBER:
-			if (right->type != Type::NUMBER) abortWithTypeError();
-			type = Type::NUMBER;
-			Generator::appendOutput("addpd xmm0, xmm1");
-			Generator::push("xmm0");
-			break;
-		case Type::STRING:
-			if (right->type != Type::STRING) abortWithTypeError();
-			type = Type::STRING;
-			Generator::appendComment(
-				"Move rax to r12 because rax will be used for returning values for other c functions. Also can't "
-				"use other registers because they are callee-saved");
-			Generator::appendOutput("mov r12, rax");
 
-			Generator::appendComment("Calculate length of left string");
-			Generator::appendOutput("mov rdi, r12");
-			Generator::appendOutput("call strlen");
-			Generator::appendOutput("mov r8, rax");	 // strlen stores result in rax
+	// if either left or right is string, do string concatenation
+	if (left->type == Type::STRING || right->type == Type::STRING) {
+		type = Type::STRING;
 
-			Generator::appendComment("Calculate length of right string");
-			Generator::appendOutput("mov rdi, rbx");
-			Generator::appendOutput("call strlen");
-			Generator::appendOutput("mov r9, rax");
+		// need to move to r12 because other registers are callee-saved and rax is used to return values by other c functions
+		if (left->type == Type::BOOLEAN || right->type == Type::BOOLEAN) {
+			std::string equalLabel = Generator::createLabel();
+			std::string doneLabel = Generator::createLabel();
 
-			Generator::appendComment(
-				"Allocate memory using malloc for the sum of both lengths + 1 for the null terminator");
-			Generator::appendOutput("add r8, r9");
-			Generator::appendOutput("inc r8");
-			Generator::appendOutput("mov rdi, r8");
+			std::string stringRegister;
+
+			if (left->type == Type::BOOLEAN) {
+				Generator::appendOutput("cmp rax, 0");
+				stringRegister = "r12";
+			} else {
+				Generator::appendOutput("cmp rbx, 0");
+				Generator::appendOutput("mov r12, rax");
+				stringRegister = "rbx";
+			}
+
+			Generator::appendOutput("je " + equalLabel);
+			Generator::appendOutput("mov " + stringRegister + ", true");
+			Generator::appendOutput("jmp " + doneLabel);
+			Generator::appendOutput(equalLabel + ":", false);
+			Generator::appendOutput("mov " + stringRegister + ", false");
+			Generator::appendOutput(doneLabel + ":", false);
+		} else if (left->type == Type::NUMBER || right->type == Type::NUMBER) {
+			std::string stringRegister;
+			if (right->type == Type::NUMBER) {
+				Generator::appendOutput("movsd xmm0, xmm1");
+				Generator::appendOutput("mov r12, rax");
+				stringRegister = "rbx";
+			} else {
+				stringRegister = "r12";
+			}
+
+			Generator::push("xmm0");  // need to pre-push xmm0 to the stack because malloc will clobber this register
+			Generator::appendOutput("mov rdi, 15");	 // allocate 15 chars for the string
 			Generator::appendOutput("call malloc");
+			Generator::appendOutput("mov " + stringRegister + ", rax");
+			Generator::pop("xmm0");
 
-			Generator::appendComment("Store the allocated memory pointer in the result");
-			Generator::appendOutput("mov rdi, rax");
+			Generator::appendOutput("mov rdi, " + stringRegister);
+			Generator::appendOutput("mov rsi, 15");
+			Generator::appendOutput("mov rdx, float_format");
+			Generator::appendOutput("mov rax, 1");
+			Generator::appendOutput("call snprintf");
+		} else if (left->type == Type::UNKNOWN || right->type == Type::UNKNOWN) {
+			if (right->type == Type::UNKNOWN) {
+				Generator::appendOutput("mov r12, rax");
+				Generator::appendOutput("mov rbx, unknown");
+			} else {
+				Generator::appendOutput("mov r12, unknown");
+			}
+		} else {
+			Generator::appendOutput("mov r12, rax");
+		}
 
-			Generator::appendComment("Copy string1 into the allocated memory (using strcpy)");
-			Generator::appendOutput("mov rsi, r12");
-			Generator::appendOutput("call strcpy");
+		Generator::appendComment("Calculate length of left string");
+		Generator::appendOutput("mov rdi, r12");
+		Generator::appendOutput("call strlen");
+		Generator::appendOutput("mov r8, rax");	 // strlen stores result in rax
 
-			Generator::appendComment("Copy string2 into the allocated memory (using strcat)");
-			Generator::appendOutput("mov rsi, rbx");
-			Generator::appendOutput("call strcat");
+		Generator::appendComment("Calculate length of right string");
+		Generator::appendOutput("mov rdi, rbx");
+		Generator::appendOutput("call strlen");
+		Generator::appendOutput("mov r9, rax");
 
-			Generator::appendComment("At this point, the memory pointed by rax contains the concatenated string.");
-			Generator::push("rax");
-			break;
-		default:
-			Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(),
-									   op.lineNumber);
-			break;
+		Generator::appendComment(
+			"Allocate memory using malloc for the sum of both lengths + 1 for the null terminator");
+		Generator::appendOutput("add r8, r9");
+		Generator::appendOutput("inc r8");
+		Generator::appendOutput("mov rdi, r8");
+		Generator::appendOutput("call malloc");
+
+		Generator::appendComment("Store the allocated memory pointer in the result");
+		Generator::appendOutput("mov rdi, rax");
+
+		Generator::appendComment("Copy string1 into the allocated memory (using strcpy)");
+		Generator::appendOutput("mov rsi, r12");
+		Generator::appendOutput("call strcpy");
+
+		Generator::appendComment("Copy string2 into the allocated memory (using strcat)");
+		Generator::appendOutput("mov rdi, rax");
+		Generator::appendOutput("mov rsi, rbx");
+		Generator::appendOutput("call strcat");
+
+		Generator::appendComment("At this point, the memory pointed by rax contains the concatenated string.");
+		Generator::push("rax");
+	} else if (left->type == Type::NUMBER && right->type == Type::NUMBER) {
+		type = Type::NUMBER;
+		Generator::appendOutput("addpd xmm0, xmm1");
+		Generator::push("xmm0");
+	} else {
+		Error::abortWithLineNumber("Could not perform " + op.value + " on type " + left->getTypeName(), op.lineNumber);
 	}
 }
 
@@ -164,13 +206,9 @@ void BinaryExpression::handleDivide() {
 }
 
 void BinaryExpression::handleDoubleEquals() {
-	if (left->type != Type::NUMBER && left->type != Type::BOOLEAN && left->type != Type::STRING)
-		Error::abortWithLineNumber("Could not perform " + op.value + " on type" + left->getTypeName(), op.lineNumber);
-
-	Type validTypes[] = {Type::NUMBER, Type::BOOLEAN, Type::STRING};
-
 	if (left->type != right->type) abortWithTypeError();
 
+	Type validTypes[] = {Type::NUMBER, Type::BOOLEAN, Type::STRING};
 	Expression* leftTemp = left.get();
 	bool isValidComparisonType = std::find_if(std::begin(validTypes), std::end(validTypes), [leftTemp](Type t) {
 									 return leftTemp->type == t;

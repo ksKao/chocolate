@@ -23,7 +23,7 @@ std::stringstream Generator::getOutput(Scope &program) {
 	appendOutput("section .text", false);
 	appendOutput("global main");
 	appendOutput("default rel");
-	appendOutput("extern printf, strlen, strcat, strcpy, strcmp, malloc");
+	appendOutput("extern printf, strlen, strcat, strcpy, strcmp, snprintf, malloc");
 	appendOutput("");
 
 	appendOutput("main:", false);
@@ -48,10 +48,12 @@ std::stringstream Generator::getOutput(Scope &program) {
 	outputString << "\tone DQ 1.0" << std::endl;
 
 	// setup for printf
-	outputString << "\tfloat_format db `%f\\n`, 0" << std::endl;
+	outputString << "\tfloat_format_endl db `%f\\n`, 0" << std::endl;
+	outputString << "\tfloat_format db `%f`, 0" << std::endl;
 	outputString << "\tstring_format db `%s\\n`, 0" << std::endl;
 	outputString << "\ttrue db 'true', 0" << std::endl;
 	outputString << "\tfalse db 'false', 0" << std::endl;
+	outputString << "\tunknown db 'unknown', 0" << std::endl;
 
 	outputString << std::endl;
 
