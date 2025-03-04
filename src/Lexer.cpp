@@ -1,16 +1,13 @@
 #include "Lexer.h"
 
-#include <optional>
-#include <vector>
-
 #include "Error.h"
 #include "Token.h"
 
-const std::vector<Token> Lexer::keywords = {
-	{TokenType::LET, "let"},   {TokenType::NULL_, "null"},	{TokenType::PRINT, "print"},
-	{TokenType::IF, "if"},	   {TokenType::TRUE, "true"},	{TokenType::FALSE, "false"},
-	{TokenType::ELSE, "else"}, {TokenType::WHILE, "while"}, {TokenType::FOR, "for"},
-};
+const std::vector<Token> Lexer::keywords = {{TokenType::LET, "let"},	 {TokenType::NULL_, "null"},
+											{TokenType::PRINT, "print"}, {TokenType::IF, "if"},
+											{TokenType::TRUE, "true"},	 {TokenType::FALSE, "false"},
+											{TokenType::ELSE, "else"},	 {TokenType::WHILE, "while"},
+											{TokenType::FOR, "for"},	 {TokenType::FUNCTION, "function"}};
 
 char Lexer::getChar() const {
 	if (src.length() <= i) return '\0';
@@ -210,7 +207,7 @@ std::vector<Token> Lexer::tokenize() {
 			tokens.emplace_back(parseNumber());
 		} else if (isalpha(character)) {
 			tokens.emplace_back(parseWord());
-		} else if (iswspace(character)) {  // ignore white space
+		} else if (isspace(character)) {  // ignore white space
 			advance();
 			continue;
 		} else if (character == '/' && peek() == '/') {

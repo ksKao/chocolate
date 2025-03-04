@@ -1,6 +1,7 @@
 #include "AST/BinaryExpression.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include "AST/BinaryExpression.h"
 #include "AST/Identifier.h"

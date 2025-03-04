@@ -33,6 +33,7 @@ enum class TokenType {
 	INCREMENT,
 	DECREMENT,
 	STRING,
+	FUNCTION,
 	NULL_,
 	PRINT,
 	END_OF_FILE,

@@ -5,6 +5,7 @@
 
 #include "AST/Expression.h"
 #include "AST/ForStatement.h"
+#include "AST/FunctionDeclarationStatement.h"
 #include "AST/IfStatement.h"
 #include "AST/PrintStatement.h"
 #include "AST/Scope.h"
@@ -48,4 +49,5 @@ class Parser {
 	std::unique_ptr<IfStatement> parseIfStatement();
 	std::unique_ptr<WhileStatement> parseWhileStatement();
 	std::unique_ptr<ForStatement> parseForStatement();
+	std::unique_ptr<FunctionDeclarationStatement> parseFunctionDeclarationStatement();
 };

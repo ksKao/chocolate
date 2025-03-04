@@ -1,10 +1,12 @@
 #include "Parser.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "AST/AssignmentExpression.h"
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
+#include "AST/FunctionDeclarationStatement.h"
 #include "AST/Identifier.h"
 #include "AST/IncrementDecrementExpression.h"
 #include "AST/NullLiteral.h"
@@ -289,6 +291,8 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parseWhileStatement();
 		case TokenType::FOR:
 			return parseForStatement();
+		case TokenType::FUNCTION:
+			return parseFunctionDeclarationStatement();
 		default:
 			return parseExpression(true);
 	}
@@ -417,6 +421,26 @@ std::unique_ptr<ForStatement> Parser::parseForStatement() {
 	forStatement->scope = parseScope();
 
 	return forStatement;
+}
+
+std::unique_ptr<FunctionDeclarationStatement> Parser::parseFunctionDeclarationStatement() {
+	Token functionToken = eat(TokenType::FUNCTION);
+
+	std::unique_ptr<FunctionDeclarationStatement> functionDeclarationStatement =
+		std::make_unique<FunctionDeclarationStatement>();
+	functionDeclarationStatement->functionToken = functionToken;
+
+	Token identifierToken = eat(TokenType::IDENTIFIER);
+
+	functionDeclarationStatement->identifier = std::make_unique<Identifier>();
+	functionDeclarationStatement->identifier->token = identifierToken;
+
+	eat(TokenType::OPEN_PARENTHESIS);
+	eat(TokenType::CLOSE_PARENTHESIS);
+
+	functionDeclarationStatement->scope = parseScope();
+
+	return functionDeclarationStatement;
 }
 
 Scope Parser::parse() {

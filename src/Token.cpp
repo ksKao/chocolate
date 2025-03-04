@@ -47,6 +47,7 @@ const std::unordered_map<TokenType, std::string> Token::tokenTypeToStringMap = {
 	{TokenType::INCREMENT, "++"},
 	{TokenType::DECREMENT, "--"},
 	{TokenType::STRING, "string"},
+	{TokenType::FUNCTION, "function"},
 	{TokenType::NULL_, "null"},
 	{TokenType::PRINT, "print"},
 	{TokenType::END_OF_FILE, "eof"},
