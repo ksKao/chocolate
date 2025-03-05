@@ -7,6 +7,7 @@ struct FunctionCall : Expression {
 	std::unique_ptr<Identifier> identifier;
 	std::vector<Expression> parameters;
 
+	~FunctionCall() = default;
 	inline std::string getName() const override {
 		return "Function Call Expression";
 	}

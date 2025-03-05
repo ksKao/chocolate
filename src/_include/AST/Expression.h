@@ -10,6 +10,7 @@ struct Expression : Node {
 	Type type;
 	static const std::unordered_map<Type, std::string> typeToStringMap;
 
+	virtual ~Expression() = default;
 	inline std::string getTypeName() const {
 		return typeToStringMap.at(type);
 	}
