@@ -34,5 +34,7 @@ void Identifier::generateAssembly() {
 			Generator::copyValueFromStackTo("rax", variable->getStackOffset());
 			Generator::push("rax");
 			break;
+		case Type::UNKNOWN:
+			break;
 	}
 }

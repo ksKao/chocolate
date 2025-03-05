@@ -6,6 +6,7 @@
 #include "AST/AssignmentExpression.h"
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
+#include "AST/FunctionCall.h"
 #include "AST/FunctionDeclarationStatement.h"
 #include "AST/Identifier.h"
 #include "AST/IncrementDecrementExpression.h"
@@ -223,7 +224,16 @@ std::unique_ptr<Expression> Parser::parseIncrementDecrementExpression(bool isSta
 std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 	switch (getToken().type) {
 		case TokenType::IDENTIFIER: {
-			return parseIdentifier(isStatement);
+			std::unique_ptr<Identifier> identifier = parseIdentifier(isStatement);
+			if (getToken().type != TokenType::OPEN_PARENTHESIS) return identifier;
+
+			// handle function call
+			std::unique_ptr<FunctionCall> functionCall = std::make_unique<FunctionCall>();
+			functionCall->identifier = std::move(identifier);
+			functionCall->isStatement = isStatement;
+			eat(TokenType::OPEN_PARENTHESIS);
+			eat(TokenType::CLOSE_PARENTHESIS);
+			return functionCall;
 		}
 		case TokenType::NUMBER: {
 			std::unique_ptr<NumericLiteral> numericLiteral = std::make_unique<NumericLiteral>();
@@ -269,9 +279,11 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression(bool isStatement) {
 
 std::unique_ptr<Identifier> Parser::parseIdentifier(bool isStatement) {
 	std::unique_ptr<Identifier> identifier = std::make_unique<Identifier>();
+
 	Token identifierToken = eat(TokenType::IDENTIFIER);
 	identifier->token = identifierToken;
 	identifier->isStatement = isStatement;
+
 	return identifier;
 }
 
