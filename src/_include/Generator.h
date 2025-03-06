@@ -3,6 +3,7 @@
 #include <string>
 
 #include "AST/Expression.h"
+#include "AST/FunctionDeclarationStatement.h"
 #include "AST/Scope.h"
 
 struct OutputLine {
@@ -71,4 +72,7 @@ class Generator {
 
 	// all data stored in the .data section
 	static std::vector<Data> data;
+
+	// all the declared functions, need to store separately because the generator will only generate the definition in ASM at the end
+	static std::vector<FunctionDeclarationStatement *> declaredFunctions;
 };

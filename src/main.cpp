@@ -1,7 +1,5 @@
-#include <iostream>
 #include <sstream>
 
-#include "Error.h"
 #include "FileHandler.h"
 #include "Generator.h"
 #include "Lexer.h"

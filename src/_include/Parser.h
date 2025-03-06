@@ -42,12 +42,13 @@ class Parser {
 	std::unique_ptr<Identifier> parseIdentifier(bool isStatement);
 
 	// statements
-	std::unique_ptr<Node> parseStatement();
+	std::unique_ptr<Node> parseStatement(Scope& scope);
 	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
 	std::unique_ptr<PrintStatement> parsePrintStatement();
 	std::unique_ptr<Scope> parseScope();
 	std::unique_ptr<IfStatement> parseIfStatement();
 	std::unique_ptr<WhileStatement> parseWhileStatement();
-	std::unique_ptr<ForStatement> parseForStatement();
+	// returns scope to prevent the variable declared in init statement to spill over
+	std::unique_ptr<Scope> parseForStatement();
 	std::unique_ptr<FunctionDeclarationStatement> parseFunctionDeclarationStatement();
 };

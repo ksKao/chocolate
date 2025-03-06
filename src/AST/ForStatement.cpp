@@ -9,13 +9,13 @@ void ForStatement::print(const std::string& indent) const {
 	std::cout << indent << getName() << ": " << std::endl;
 
 	std::cout << indent << "Init Statement: " << std::endl;
-	initStatement->print(indent + "\t");
+	if (initStatement.has_value()) initStatement.value()->print(indent + "\t");
 
 	std::cout << indent << "Condition: " << std::endl;
-	condition->print(indent + "\t");
+	if (condition.has_value()) condition.value()->print(indent + "\t");
 
 	std::cout << indent << "Update Statement: " << std::endl;
-	updateExpression->print(indent + "\t");
+	if (updateExpression.has_value()) updateExpression.value()->print(indent + "\t");
 
 	scope->print(indent + "\t");
 }
@@ -23,10 +23,7 @@ void ForStatement::print(const std::string& indent) const {
 void ForStatement::generateAssembly() {
 	Generator::appendComment("For statement");
 
-	// start scope here so that the variables declared inside the init statement will not spill over
-	Generator::startScope();
-
-	initStatement->generateAssembly();
+	if (initStatement.has_value()) initStatement.value()->generateAssembly();
 	std::string comparisonLabel = Generator::createLabel();
 	Generator::appendOutput("jmp " + comparisonLabel);
 
@@ -35,22 +32,20 @@ void ForStatement::generateAssembly() {
 
 	Generator::startScope();
 	scope->generateAssembly();
-	updateExpression->generateAssembly();
+	if (updateExpression.has_value()) updateExpression.value()->generateAssembly();
 	Generator::pop();
 	Generator::endScope();
 
 	Generator::appendOutput(comparisonLabel + ": ", false);
 	Generator::appendComment("For statement condition");
-	condition->generateAssembly();
+	if (condition.has_value()) condition.value()->generateAssembly();
 	// need to call this after calling condition->generateAssembly to get the type
-	if (condition->type != Type::BOOLEAN)
+	if (condition.has_value() && condition.value()->type != Type::BOOLEAN)
 		Error::abortWithLineNumber("Expected boolean type for while statement condition, but received " +
-									   condition->getTypeName() + " instead",
+									   condition.value()->getTypeName() + " instead",
 								   forToken.lineNumber);
 
 	Generator::pop("rax");
 	Generator::appendOutput("cmp rax, 1");
 	Generator::appendOutput("je " + loopCodeLabel);
-
-	Generator::endScope();
 }

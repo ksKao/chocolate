@@ -1,12 +1,14 @@
 #pragma once
 
+#include <optional>
+
 #include "AST/Expression.h"
 #include "AST/Scope.h"
 
 struct ForStatement : Node {
-	std::unique_ptr<Node> initStatement;
-	std::unique_ptr<Expression> condition;
-	std::unique_ptr<Expression> updateExpression;
+	std::optional<std::unique_ptr<Node>> initStatement;
+	std::optional<std::unique_ptr<Expression>> condition;
+	std::optional<std::unique_ptr<Expression>> updateExpression;
 	std::unique_ptr<Scope> scope;
 	Token forToken;
 

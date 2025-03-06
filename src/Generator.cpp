@@ -163,3 +163,4 @@ std::unique_ptr<std::vector<OutputLine>> Generator::output = std::make_unique<st
 std::vector<Variable> Generator::variables;
 std::vector<size_t> Generator::numbersOfVariablesDeclaredBeforeScope;
 std::vector<Data> Generator::data;
+std::vector<FunctionDeclarationStatement *> Generator::declaredFunctions;

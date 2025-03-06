@@ -3,6 +3,8 @@
 #include "AST/Identifier.h"
 #include "AST/Scope.h"
 
+struct Scope;
+
 struct FunctionDeclarationStatement : Node {
 	std::unique_ptr<Identifier> identifier;
 	std::unique_ptr<Scope> scope;

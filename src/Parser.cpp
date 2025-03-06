@@ -6,6 +6,7 @@
 #include "AST/AssignmentExpression.h"
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
+#include "AST/EmptyStatement.h"
 #include "AST/FunctionCall.h"
 #include "AST/FunctionDeclarationStatement.h"
 #include "AST/Identifier.h"
@@ -17,6 +18,7 @@
 #include "AST/StringLiteral.h"
 #include "Error.h"
 #include "Token.h"
+#include "_include/Token.h"
 
 /// @brief Consume the token at the current location and advance index
 /// @return The token consumed
@@ -287,7 +289,7 @@ std::unique_ptr<Identifier> Parser::parseIdentifier(bool isStatement) {
 	return identifier;
 }
 
-std::unique_ptr<Node> Parser::parseStatement() {
+std::unique_ptr<Node> Parser::parseStatement(Scope& scope) {
 	Token token = getToken();
 
 	switch (token.type) {
@@ -305,6 +307,9 @@ std::unique_ptr<Node> Parser::parseStatement() {
 			return parseForStatement();
 		case TokenType::FUNCTION:
 			return parseFunctionDeclarationStatement();
+		case TokenType::SEMI_COLON:
+			eat(TokenType::SEMI_COLON);
+			return std::make_unique<EmptyStatement>();
 		default:
 			return parseExpression(true);
 	}
@@ -364,7 +369,7 @@ std::unique_ptr<Scope> Parser::parseScope() {
 	std::unique_ptr<Scope> scope = std::make_unique<Scope>();
 
 	while (getToken().type != TokenType::CLOSE_CURLY) {
-		scope->statements.push_back(parseStatement());
+		scope->statements.push_back(parseStatement(*scope));
 	}
 
 	eat(TokenType::CLOSE_CURLY);
@@ -414,7 +419,8 @@ std::unique_ptr<WhileStatement> Parser::parseWhileStatement() {
 	return whileStatement;
 }
 
-std::unique_ptr<ForStatement> Parser::parseForStatement() {
+std::unique_ptr<Scope> Parser::parseForStatement() {
+	std::unique_ptr<Scope> scope = std::make_unique<Scope>();
 	Token forToken = eat(TokenType::FOR);
 
 	eat(TokenType::OPEN_PARENTHESIS);
@@ -422,17 +428,29 @@ std::unique_ptr<ForStatement> Parser::parseForStatement() {
 	std::unique_ptr<ForStatement> forStatement = std::make_unique<ForStatement>();
 	forStatement->forToken = forToken;
 
-	forStatement->initStatement = parseStatement();
-	forStatement->condition = parseExpression();
+	if (getToken().type == TokenType::SEMI_COLON) {
+		forStatement->initStatement = std::make_unique<EmptyStatement>();
+	} else {
+		forStatement->initStatement = parseStatement(*scope);
+	}
+
+	// need to handle in case the statement parsed do not require a semicolon, such as scope
+	if (getToken().type == TokenType::SEMI_COLON) eat(TokenType::SEMI_COLON);
+
+	// check again if the condition expression is empty
+	if (getToken().type != TokenType::SEMI_COLON) forStatement->condition = parseExpression();
+
 	eat(TokenType::SEMI_COLON);
 
-	forStatement->updateExpression = parseExpression();
+	// need to handle in case there is no update expression
+	if (getToken().type != TokenType::CLOSE_PARENTHESIS) forStatement->updateExpression = parseExpression();
 
 	eat(TokenType::CLOSE_PARENTHESIS);
 
 	forStatement->scope = parseScope();
 
-	return forStatement;
+	scope->statements.push_back(std::move(forStatement));
+	return scope;
 }
 
 std::unique_ptr<FunctionDeclarationStatement> Parser::parseFunctionDeclarationStatement() {
@@ -458,7 +476,7 @@ std::unique_ptr<FunctionDeclarationStatement> Parser::parseFunctionDeclarationSt
 Scope Parser::parse() {
 	Scope program(true);
 
-	while (!isEof()) program.statements.push_back(parseStatement());
+	while (!isEof()) program.statements.push_back(parseStatement(program));
 
 	return program;
 }
