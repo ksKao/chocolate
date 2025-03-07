@@ -7,6 +7,7 @@
 #include "AST/BinaryExpression.h"
 #include "AST/BooleanLiteral.h"
 #include "AST/EmptyStatement.h"
+#include "AST/ForStatement.h"
 #include "AST/FunctionCall.h"
 #include "AST/FunctionDeclarationStatement.h"
 #include "AST/Identifier.h"
@@ -51,10 +52,6 @@ Token Parser::getToken(int advance) const {
 	}
 
 	return tokens.at(indexToGet);
-}
-
-bool Parser::isEof() const {
-	return getToken().type == TokenType::END_OF_FILE;
 }
 
 std::unique_ptr<Expression> Parser::parseExpression(bool isStatement) {
@@ -289,7 +286,7 @@ std::unique_ptr<Identifier> Parser::parseIdentifier(bool isStatement) {
 	return identifier;
 }
 
-std::unique_ptr<Node> Parser::parseStatement(Scope& scope) {
+std::unique_ptr<Node> Parser::parseStatement() {
 	Token token = getToken();
 
 	switch (token.type) {
@@ -363,16 +360,24 @@ std::unique_ptr<PrintStatement> Parser::parsePrintStatement() {
 	return printStatement;
 }
 
-std::unique_ptr<Scope> Parser::parseScope() {
-	eat(TokenType::OPEN_CURLY);
+std::unique_ptr<Scope> Parser::parseScope(bool isRoot) {
+	if (!isRoot) eat(TokenType::OPEN_CURLY);
 
 	std::unique_ptr<Scope> scope = std::make_unique<Scope>();
+	TokenType endScopeTokenType = isRoot ? TokenType::END_OF_FILE : TokenType::CLOSE_CURLY;
 
-	while (getToken().type != TokenType::CLOSE_CURLY) {
-		scope->statements.push_back(parseStatement(*scope));
+	while (getToken().type != endScopeTokenType) {
+		std::unique_ptr<Node> statement = parseStatement();
+
+		if (dynamic_cast<FunctionDeclarationStatement*>(statement.get())) {
+			scope->functions.push_back(std::unique_ptr<FunctionDeclarationStatement>(
+				dynamic_cast<FunctionDeclarationStatement*>(statement.release())));
+		} else {
+			scope->statements.push_back(std::move(statement));
+		}
 	}
 
-	eat(TokenType::CLOSE_CURLY);
+	eat(endScopeTokenType);
 
 	return scope;
 }
@@ -431,7 +436,7 @@ std::unique_ptr<Scope> Parser::parseForStatement() {
 	if (getToken().type == TokenType::SEMI_COLON) {
 		forStatement->initStatement = std::make_unique<EmptyStatement>();
 	} else {
-		forStatement->initStatement = parseStatement(*scope);
+		forStatement->initStatement = parseStatement();
 	}
 
 	// need to handle in case the statement parsed do not require a semicolon, such as scope
@@ -449,6 +454,7 @@ std::unique_ptr<Scope> Parser::parseForStatement() {
 
 	forStatement->scope = parseScope();
 
+	// create a scope specifically for this for loop to limit the accessibility of the variable in the init statement.
 	scope->statements.push_back(std::move(forStatement));
 	return scope;
 }
@@ -474,9 +480,8 @@ std::unique_ptr<FunctionDeclarationStatement> Parser::parseFunctionDeclarationSt
 }
 
 Scope Parser::parse() {
-	Scope program(true);
+	std::unique_ptr<Scope> program = parseScope(true);
+	program->isRoot = true;
 
-	while (!isEof()) program.statements.push_back(parseStatement(program));
-
-	return program;
+	return std::move(*program);
 }

@@ -7,6 +7,10 @@
 void Scope::print(const std::string &indent) const {
 	std::cout << indent << "Begin " << getName() << std::endl;
 
+	for (int i = 0; i < functions.size(); i++) {
+		functions.at(i)->print(indent + "\t");
+	}
+
 	for (int i = 0; i < statements.size(); i++) {
 		statements.at(i)->print(indent + "\t");
 	}

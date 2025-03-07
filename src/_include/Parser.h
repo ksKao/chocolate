@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "AST/Expression.h"
-#include "AST/ForStatement.h"
 #include "AST/FunctionDeclarationStatement.h"
 #include "AST/IfStatement.h"
 #include "AST/PrintStatement.h"
@@ -26,7 +25,6 @@ class Parser {
   private:
 	Token eat(std::optional<TokenType> type);
 	Token getToken(int advance = 0) const;
-	bool isEof() const;
 
 	// expressions
 	std::unique_ptr<Expression> parseExpression(bool isStatement = false);
@@ -42,10 +40,10 @@ class Parser {
 	std::unique_ptr<Identifier> parseIdentifier(bool isStatement);
 
 	// statements
-	std::unique_ptr<Node> parseStatement(Scope& scope);
+	std::unique_ptr<Node> parseStatement();
 	std::unique_ptr<VariableDeclarationStatement> parseVariableDeclarationStatement();
 	std::unique_ptr<PrintStatement> parsePrintStatement();
-	std::unique_ptr<Scope> parseScope();
+	std::unique_ptr<Scope> parseScope(bool isRoot = false);
 	std::unique_ptr<IfStatement> parseIfStatement();
 	std::unique_ptr<WhileStatement> parseWhileStatement();
 	// returns scope to prevent the variable declared in init statement to spill over
