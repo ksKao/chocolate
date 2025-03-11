@@ -7,6 +7,6 @@
 
 struct Node {
 	virtual std::string getName() const = 0;
-	virtual void print(const std::string &indent) const = 0;
+	virtual void print(const std::string& indent) const = 0;
 	virtual void generateAssembly() = 0;
 };

@@ -1,6 +1,7 @@
 #include "AST/AssignmentExpression.h"
 
 #include <iostream>
+#include <optional>
 
 #include "AST/Identifier.h"
 #include "Error.h"

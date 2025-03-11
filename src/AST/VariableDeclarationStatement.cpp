@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "AST/Identifier.h"
 #include "Error.h"
 #include "Generator.h"
 
@@ -24,5 +25,5 @@ void VariableDeclarationStatement::generateAssembly() {
 		"Variable Declaration Statement (not doing anything since the right side will already be "
 		"pushing a value onto the stack): " +
 		identifier->token.value);
-	Generator::addVariable(identifier->token.value, value->type);
+	Generator::addVariable(identifier->token.value, value->type, identifier->token.lineNumber);
 }

@@ -19,6 +19,12 @@ struct Variable {
 	size_t getStackOffset();
 };
 
+struct Function {
+	std::string name;
+	std::string label;
+	std::unique_ptr<std::vector<OutputLine>> assemblyDefinition = std::make_unique<std::vector<OutputLine>>();
+};
+
 struct Data {
 	std::string size;  // DD, DW, DQ etc
 	std::string value;
@@ -28,6 +34,11 @@ class Generator {
   public:
 	static const int stackUnitSize = 16;
 
+	// when encountering a function definition, will push to this list and pop when finish generating assembly for that function
+	// used to track whether the current assembly generation is inside a function or not
+	// will store pointers pointing to objects in the functions vector
+	static std::vector<std::shared_ptr<Function>> functionTrace;
+
   public:
 	static void appendOutput(const std::string &line, bool indent = true);
 	static void appendComment(const std::string &line);
@@ -35,8 +46,11 @@ class Generator {
 	static std::string getDataName(const std::string &value, const std::string &size = "DQ");
 	static std::stringstream getOutput(Scope &program);
 
-	static void addVariable(const std::string &variableName, Type type);
+	static void addVariable(const std::string &variableName, Type type, size_t lineNo);
 	static Variable *getVariable(const std::string variableName);
+
+	static void addFunctions(const std::vector<std::unique_ptr<FunctionDeclarationStatement>> &functionsToAdd);
+	static std::shared_ptr<Function> getFunction(const std::string functionName);
 
 	static std::string createLabel();
 
@@ -73,6 +87,12 @@ class Generator {
 	// all data stored in the .data section
 	static std::vector<Data> data;
 
-	// all the declared functions, need to store separately because the generator will only generate the definition in ASM at the end
-	static std::vector<FunctionDeclarationStatement *> declaredFunctions;
+	// all the declared functions in the scope(s)
+	static std::vector<std::shared_ptr<Function>> functions;
+
+	// need to store all declared functions in the program separately because the generator will only generate the definition in ASM at the end
+	static std::vector<std::shared_ptr<Function>> allFunctions;
+
+	// each element stores the number of functions declared before the scope
+	static std::vector<size_t> numbersOfFunctionsDeclaredBeforeScope;
 };

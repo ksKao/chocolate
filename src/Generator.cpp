@@ -11,11 +11,13 @@ size_t Variable::getStackOffset() {
 }
 
 void Generator::appendOutput(const std::string &line, bool indent) {
-	output->push_back({line, indent});
+	if (functionTrace.size() == 0) output->push_back({line, indent});
+	else functionTrace.back()->assemblyDefinition->push_back({line, indent});
 }
 
 void Generator::appendComment(const std::string &line) {
-	output->push_back({"; " + line, true});
+	if (functionTrace.size() == 0) output->push_back({"; " + line, true});
+	else functionTrace.back()->assemblyDefinition->push_back({"; " + line, true});
 }
 
 std::stringstream Generator::getOutput(Scope &program) {
@@ -60,6 +62,15 @@ std::stringstream Generator::getOutput(Scope &program) {
 	for (const OutputLine &outputLine : *output)
 		outputString << (outputLine.indent ? "\t" : "") << outputLine.content << std::endl;
 
+	for (const std::shared_ptr<Function> function : allFunctions) {
+		outputString << function->label << ":" << std::endl;
+		size_t test = function->assemblyDefinition->size();
+		for (const OutputLine &outputLine : *function->assemblyDefinition) {
+			outputString << (outputLine.indent ? "\t" : "") << outputLine.content << std::endl;
+		}
+		outputString << std::endl;
+	}
+
 	return outputString;
 }
 
@@ -78,9 +89,9 @@ size_t Generator::getStackSize() {
 	return stackSize;
 }
 
-void Generator::addVariable(const std::string &variableName, Type type) {
+void Generator::addVariable(const std::string &variableName, Type type, size_t lineNo) {
 	if (getVariable(variableName) != nullptr)
-		Error::abort("Trying to add a variable (" + variableName + ") when it already exists. ");
+		Error::abortWithLineNumber("Trying to add a variable (" + variableName + ") when it already exists. ", lineNo);
 
 	variables.emplace_back(variableName, stackSize - 1, type);
 }
@@ -93,6 +104,30 @@ Variable *Generator::getVariable(const std::string variableName) {
 	return nullptr;
 }
 
+void Generator::addFunctions(const std::vector<std::unique_ptr<FunctionDeclarationStatement>> &functionsToAdd) {
+	functions.reserve(functionsToAdd.size());
+	allFunctions.reserve(functionsToAdd.size());
+
+	for (const std::unique_ptr<FunctionDeclarationStatement> &functionToAdd : functionsToAdd) {
+		if (getFunction(functionToAdd->identifier->token.value) != nullptr)
+			Error::abortWithLineNumber("Trying to declare a function (" + functionToAdd->identifier->token.value +
+										   ") when it already exists. ",
+									   functionToAdd->functionToken.lineNumber);
+
+		functions.emplace_back(new Function{functionToAdd->identifier->token.value, createLabel()});
+
+		allFunctions.push_back(functions.back());
+	}
+}
+
+std::shared_ptr<Function> Generator::getFunction(const std::string functionName) {
+	for (const std::shared_ptr<Function> function : functions) {
+		if (function->name == functionName) return function;
+	}
+
+	return nullptr;
+}
+
 std::string Generator::createLabel() {
 	labelCounter++;
 	return "label" + std::to_string(labelCounter);
@@ -100,19 +135,23 @@ std::string Generator::createLabel() {
 
 void Generator::startScope() {
 	numbersOfVariablesDeclaredBeforeScope.push_back(variables.size());
+	numbersOfFunctionsDeclaredBeforeScope.push_back(functions.size());
 }
 
 void Generator::endScope() {
-	size_t popCount = variables.size() - numbersOfVariablesDeclaredBeforeScope.back();
+	size_t variablePopCount = variables.size() - numbersOfVariablesDeclaredBeforeScope.back();
+	size_t functionPopCount = functions.size() - numbersOfFunctionsDeclaredBeforeScope.back();
 
-	stackSize -= popCount;
+	stackSize -= variablePopCount;
 
 	appendComment("Pop scope");
-	appendOutput("add rsp, " + std::to_string(popCount * stackUnitSize));
+	appendOutput("add rsp, " + std::to_string(variablePopCount * stackUnitSize));
 
-	variables.resize(variables.size() - popCount);
+	variables.resize(variables.size() - variablePopCount);
+	functions.resize(functions.size() - functionPopCount);
 
 	numbersOfVariablesDeclaredBeforeScope.pop_back();
+	numbersOfFunctionsDeclaredBeforeScope.pop_back();
 }
 
 void Generator::incrementStack() {
@@ -157,10 +196,13 @@ void Generator::pop(const std::string &reg) {
 
 size_t Generator::stackSize = 0;
 size_t Generator::labelCounter = 0;
+std::vector<std::shared_ptr<Function>> Generator::functionTrace;
 std::unique_ptr<std::vector<OutputLine>> Generator::output = std::make_unique<std::vector<OutputLine>>();
 
 // need these lines otherwise will have linking error
 std::vector<Variable> Generator::variables;
 std::vector<size_t> Generator::numbersOfVariablesDeclaredBeforeScope;
 std::vector<Data> Generator::data;
-std::vector<FunctionDeclarationStatement *> Generator::declaredFunctions;
+std::vector<std::shared_ptr<Function>> Generator::functions;
+std::vector<std::shared_ptr<Function>> Generator::allFunctions;
+std::vector<size_t> Generator::numbersOfFunctionsDeclaredBeforeScope;

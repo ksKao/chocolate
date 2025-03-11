@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "AST/Expression.h"
 #include "AST/Identifier.h"
 
@@ -11,6 +13,6 @@ struct AssignmentExpression : Expression {
 	inline std::string getName() const override {
 		return "Assignment Expression";
 	}
-	void print(const std::string &indent) const override;
+	void print(const std::string& indent) const override;
 	void generateAssembly() override;
 };

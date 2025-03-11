@@ -28,8 +28,14 @@ void Scope::generateAssembly() {
 
 	Generator::startScope();
 
+	Generator::addFunctions(functions);
+
 	for (std::unique_ptr<Node> &statement : statements) {
 		statement->generateAssembly();
+	}
+
+	for (std::unique_ptr<FunctionDeclarationStatement> &function : functions) {
+		function->generateAssembly();
 	}
 
 	Generator::endScope();
